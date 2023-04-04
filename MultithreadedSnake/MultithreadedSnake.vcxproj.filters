@@ -21,10 +21,16 @@
     <ClCompile Include="game.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="snake.c">
+    <ClCompile Include="fruit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fruit.c">
+    <ClCompile Include="queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cell.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="board.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,10 +41,22 @@
     <ClInclude Include="game.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="snake.h">
+    <ClInclude Include="fruit.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="fruit.h">
+    <ClInclude Include="queue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cell.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="boolean.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="direction.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="board.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
