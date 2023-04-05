@@ -12,6 +12,7 @@
 #include <stdbool.h>
 
 #define EMPTY_SNAKE 0
+#define SNAKE_BLOCK_SIZE 35
 
 // The node struct containing data
 typedef struct snake_node {
@@ -31,7 +32,6 @@ snake* create_snake();
 bool is_empty(snake* snake_p);
 bool enqueue(snake* snake_p, cell* cell_p);
 snake_node* dequeue(snake* snake_p);
-void change_cells_in_queue(snake* snake_p, direction dir);
 void destroy_snake(snake* snake_p);
 
 #endif

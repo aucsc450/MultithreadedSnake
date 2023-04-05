@@ -37,10 +37,10 @@ Draws the game board to the specified buffer.
 @param buffer - the double buffer specified in the game object (drawn to the screen in a subsequent call to update_screen)
 */
 void draw_game_board(BITMAP* buffer, FONT* game_font) {
-	int start_x = 25;
-	int start_y = 75;
-	int end_x = 75;
-	int end_y = 125;
+	int start_x = INIT_X_START_POS;
+	int start_y = INIT_Y_START_POS;
+	int end_x = INIT_X_END_POS;
+	int end_y = INIT_Y_END_POS;
 	clear_bitmap(buffer);
 	rectfill(buffer, 0, 0, WIDTH, HEIGHT, BROWN);
 	rectfill(buffer, start_x, start_y, end_x, end_y, KELLY_GREEN);
@@ -55,13 +55,13 @@ void draw_game_board(BITMAP* buffer, FONT* game_font) {
 				rectfill(buffer, start_x, start_y, end_x, end_y, DARK_LEMON_LIME);
 				swap_colour = false;
 			}
-			start_x += 50;
-			end_x += 50;
+			start_x += TILE_SIZE;
+			end_x += TILE_SIZE;
 		} // inner for
-		start_x = 25;
-		end_x = 75;
-		start_y += 50;
-		end_y += 50;
+		start_x = INIT_X_START_POS;
+		end_x = INIT_X_END_POS;
+		start_y += TILE_SIZE;
+		end_y += TILE_SIZE;
 		if (i % 2 != 0) {
 			swap_colour = false;
 		}
@@ -76,9 +76,13 @@ void draw_game_board(BITMAP* buffer, FONT* game_font) {
 } // draw_game_board
 
 void testing_snake_spawning(game_state* game_state_p) {
-	snake_node* front_node = game_state_p->player->front;
-	textprintf_ex(game_state_p->buffer, game_state_p->game_font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", front_node->cell->row, front_node->cell->col);
-	free(front_node);
+	int row = game_state_p->player->front->cell->row; // 7 
+	int col = game_state_p->player->front->cell->col; // 7
+	int x_pos = row * TILE_SIZE + X_OFFSET;
+	int y_pos = col * TILE_SIZE + Y_OFFSET;
+	rectfill(game_state_p->buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+	textprintf_ex(game_state_p->buffer, font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", game_state_p->player->front->cell->row, game_state_p->player->front->cell->col);
+	textprintf_ex(game_state_p->buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
 }
 
 /**
