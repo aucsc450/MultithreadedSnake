@@ -1,14 +1,30 @@
+/**
+* File: game.c
+*
+* Author: Anjola Aina
+* Last Modified: Tuesday, April 4th, 2023
+*
+* This file implements the game struct and its associated functions.
+*/
 #include "game.h"
 
+/**
+Creates a new game.
+@return - the game struct in memory, or NULL if not enough memory is available to create a new game
+*/
 game* create_game() {
 	game* game_obj = malloc(sizeof(game));
 	if (game_obj != NULL) {
 		game_obj->buffer = create_bitmap(WIDTH, HEIGHT);
 		return game_obj;
 	}
-	return NULL; // something wrong happened when allocating memory
-}
+	return NULL; // not enough memory to create a new game
+} // create_game
 
+/**
+Draws the game board to the specified buffer.
+@param buffer - the double buffer specified in the game object (drawn to the screen in a subsequent call to update_screen)
+*/
 void draw_game_board(BITMAP* buffer) {
 	int start_x = 25;
 	int start_y = 75;
@@ -43,15 +59,23 @@ void draw_game_board(BITMAP* buffer) {
 		}
 	} // outer for
 	textout_right_ex(buffer, font, "Made by Anjola Aina", WIDTH - 20, HEIGHT - 15, WHITE, -1);
-}
+} // draw_game_board
 
+/**
+Updates the game screen, by blitting the double buffer to the screen.
+@param buffer - the double buffer specified in the game object
+*/
 void update_screen(BITMAP* buffer) {
 	acquire_screen();
 	blit(buffer, screen, 0, 0, 0, 0, WIDTH, HEIGHT);
 	release_screen();
-}
+} // update_screen
 
+/**
+Destroys all game objects, and frees the game from memory.
+@param game_obj - the game object to be freed from memory
+*/
 void destroy_game(game* game_obj) {
 	destroy_bitmap(game_obj->buffer);
 	free(game_obj);
-}
+} // destroy_game
