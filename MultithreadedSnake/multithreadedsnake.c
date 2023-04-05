@@ -42,7 +42,9 @@ int main(void) {
 	}
 
 	draw_game_board(a_game->buffer, a_game->game_font);
+	testing_snake_spawning(a_game);
 	update_screen(a_game->buffer);
+
 	
 	while (!key[KEY_ESC]); // wait until the ESC key is pressed to do anything (busy waiting loop)
 	destroy_game(a_game);

@@ -13,22 +13,24 @@ Creates a new game.
 @return - the game struct in memory, or NULL if not enough memory is available to create a new game
 */
 game_state* create_game() {
-	game_state* game_obj = malloc(sizeof(game_state));
-	if (game_obj != NULL) {
-		game_obj->buffer = create_bitmap(WIDTH, HEIGHT);
-		game_obj->game_font = NULL;
-		return game_obj;
+	game_state* game_state_t = malloc(sizeof(game_state));
+	if (game_state_t != NULL) {
+		game_state_t->buffer = create_bitmap(WIDTH, HEIGHT);
+		game_state_t->game_font = NULL;
+		game_state_t->player = create_snake();
+		enqueue(game_state_t->player, create_cell(SIZE / 2, SIZE / 2, SNAKE));
+		return game_state_t;
 	}
 	return NULL; // not enough memory to create a new game
 } // create_game
 
-bool load_game_font(game_state* game_obj) {
-	game_obj->game_font = load_font("graphics\\franklin_gothic_heavy_font.pcx", NULL, NULL);
-	if (game_obj->game_font == NULL) {
+bool load_game_font(game_state* game_state_p) {
+	game_state_p->game_font = load_font("graphics\\franklin_gothic_heavy_font.pcx", NULL, NULL);
+	if (game_state_p->game_font == NULL) {
 		return false; // an error occured when loading the fonts
 	}
-	return true; // 
-}
+	return true;
+} // load_game_font
 
 /**
 Draws the game board to the specified buffer.
@@ -71,9 +73,13 @@ void draw_game_board(BITMAP* buffer, FONT* game_font) {
 	textprintf_ex(buffer, game_font, 25, 25, WHITE, -1, "Score: %d", 0);
 	textout_right_ex(buffer, game_font, "Stop - ESC", WIDTH - 25, 25, WHITE, -1);
 	textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d%d", 0, 0, 0);
-
-
 } // draw_game_board
+
+void testing_snake_spawning(game_state* game_state_p) {
+	snake_node* front_node = game_state_p->player->front;
+	textprintf_ex(game_state_p->buffer, game_state_p->game_font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", front_node->cell->row, front_node->cell->col);
+	free(front_node);
+}
 
 /**
 Updates the game screen, by blitting the double buffer to the screen.
@@ -89,8 +95,9 @@ void update_screen(BITMAP* buffer) {
 Destroys all game objects, and frees the game from memory.
 @param game_obj - the game object to be freed from memory
 */
-void destroy_game(game_state* game_obj) {
-	destroy_bitmap(game_obj->buffer);
-	destroy_font(game_obj->game_font);
-	free(game_obj);
+void destroy_game(game_state* game_state_p) {
+	destroy_bitmap(game_state_p->buffer);
+	destroy_font(game_state_p->game_font);
+	destroy_snake(game_state_p->player);
+	free(game_state_p);
 } // destroy_game

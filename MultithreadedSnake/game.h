@@ -11,7 +11,7 @@
 
 #include <allegro.h>
 #include <time.h>
-#include <stdbool.h>
+#include "snake.h"
 
 // Constants
 #define WIDTH 800
@@ -30,13 +30,16 @@
 typedef struct game_state {
 	BITMAP* buffer;
 	FONT* game_font;
+	snake* player;
 } game_state;
 
 // Function definitions
 game_state* create_game();
-bool load_game_font(FONT* font);
+bool load_game_font(game_state* game_state_p);
 void draw_game_board(BITMAP* buffer, FONT* font);
 void update_screen(BITMAP* buffer);
-void destroy_game(game_state* game_obj);
+void destroy_game(game_state* game_state_p);
 
+
+void testing_snake_spawning(game_state* game_state_p);
 #endif
