@@ -80,7 +80,12 @@ void testing_snake_spawning(game_state* game_state_p) {
 	int col = game_state_p->player->front->cell->col; // 7
 	int x_pos = row * TILE_SIZE + X_OFFSET;
 	int y_pos = col * TILE_SIZE + Y_OFFSET;
+	//rectfill(game_state_p->buffer, x_pos - 100, y_pos, x_pos + SNAKE_BLOCK_SIZE - 100, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+	//rectfill(game_state_p->buffer, x_pos - 50, y_pos, x_pos + SNAKE_BLOCK_SIZE - 50, y_pos + SNAKE_BLOCK_SIZE, BLACK);
 	rectfill(game_state_p->buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+	//rectfill(game_state_p->buffer, x_pos + 50, y_pos, x_pos + SNAKE_BLOCK_SIZE + 50, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+	//rectfill(game_state_p->buffer, x_pos + 100, y_pos, x_pos + SNAKE_BLOCK_SIZE + 100, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+
 	textprintf_ex(game_state_p->buffer, font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", game_state_p->player->front->cell->row, game_state_p->player->front->cell->col);
 	textprintf_ex(game_state_p->buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
 }

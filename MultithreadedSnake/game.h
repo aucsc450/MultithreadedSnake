@@ -13,9 +13,11 @@
 #include <time.h>
 #include "snake.h"
 
-// Constants
+// Screen Constants
 #define WIDTH 800
 #define HEIGHT 850
+
+// Colour Constants
 #define WHITE makecol(255, 255, 255)
 #define GREY makecol(127, 127, 127) 
 #define BLACK makecol(0, 0, 0)
@@ -24,14 +26,18 @@
 #define FOREST_BROWN makecol(63, 48, 29)
 #define BROWN makecol(89, 63, 30)
 #define DARK_BROWN makecol(26, 18, 6)
+
+// Board & Tile Size Constants
 #define SIZE 15 // in board.h (called BOARD_SIZE), here for testing purposes
 #define TILE_SIZE 50
 #define INIT_X_START_POS 25
 #define INIT_X_END_POS 75
 #define INIT_Y_START_POS 75
 #define INIT_Y_END_POS 125
-#define X_OFFSET 25
-#define Y_OFFSET 75
+#define X_OFFSET 27
+#define Y_OFFSET 77
+#define SNAKE_BLOCK_SIZE 45
+
 
 // The game struct
 typedef struct game_state {

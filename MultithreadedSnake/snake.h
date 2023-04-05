@@ -12,7 +12,6 @@
 #include <stdbool.h>
 
 #define EMPTY_SNAKE 0
-#define SNAKE_BLOCK_SIZE 35
 
 // The node struct containing data
 typedef struct snake_node {
