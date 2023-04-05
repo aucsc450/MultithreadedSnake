@@ -13,7 +13,6 @@
 #define cell_h
 #include <stdlib.h>
 #include <stdio.h>
-#include "boolean.h"
 
 // The types that a cell can take
 typedef enum cell_type {
@@ -36,7 +35,7 @@ typedef struct cell {
 } cell;
 
 // Function definitions
-cell* create_cell(int cell_row, int cell_col, cell_type type_cell);
-void free_cell(cell* a_cell);
+cell* create_cell(int row_p, int col_p, cell_type type_p);
+void destroy_cell(cell* cell_p);
 
 #endif

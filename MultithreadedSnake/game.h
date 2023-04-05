@@ -27,14 +27,16 @@
 #define SIZE 15 // in board.h (called BOARD_SIZE), here for testing purposes
 
 // The game struct
-typedef struct game {
+typedef struct game_state {
 	BITMAP* buffer;
-} game;
+	FONT* game_font;
+} game_state;
 
 // Function definitions
-game* create_game();
-void draw_game_board(BITMAP* buffer);
+game_state* create_game();
+bool load_game_font(FONT* font);
+void draw_game_board(BITMAP* buffer, FONT* font);
 void update_screen(BITMAP* buffer);
-void destroy_game(game* game_obj);
+void destroy_game(game_state* game_obj);
 
 #endif

@@ -12,6 +12,7 @@
 #ifndef board_h
 #define board_h
 #include "cell.h"
+#include "boolean.h"
 
 // Constants
 #define BOARD_SIZE 5

@@ -28,16 +28,22 @@ int main(void) {
 		allegro_message("Error initializing sound system.");
 		return 1;
 	}	
-	game* a_game = create_game();
+	game_state* a_game = create_game();
 	if (a_game == NULL) {
 		allegro_message("Error loading the game object.");
 		return 1;
 		
 	}
-	else {
-		draw_game_board(a_game->buffer);
-		update_screen(a_game->buffer);
+	
+	bool loaded_font = load_game_font(a_game);
+	if (!loaded_font) {
+		allegro_message("Error loading game font.");
+		return 1;
 	}
+
+	draw_game_board(a_game->buffer, a_game->game_font);
+	update_screen(a_game->buffer);
+	
 	while (!key[KEY_ESC]); // wait until the ESC key is pressed to do anything (busy waiting loop)
 	destroy_game(a_game);
 	allegro_exit();

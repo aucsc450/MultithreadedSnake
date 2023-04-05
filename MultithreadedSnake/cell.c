@@ -10,23 +10,26 @@
 
 /**
 Creates a cell from the specified row, column and type of cell.
-@param cell_row - the x position of the cell
-@param cell_col - the y position of the cell
-@param type_cell - the type of the cell (EMPTY, FOOD OR SNAKE_NODE)
-@return - a cell representing a point in the board
+@param row_p - the x position of the cell
+@param col_p - the y position of the cell
+@param type_p - the type of the cell (EMPTY, FOOD OR SNAKE_NODE)
+@return - a cell representing a point in the board or NULL if not enough memory exists to create a cell
 */
-cell* create_cell(int cell_row, int cell_col, cell_type type_cell) {
+cell* create_cell(int row_p, int col_p, cell_type type_p) {
     cell* a_cell = malloc(sizeof(cell));
-    a_cell->row = cell_row;
-    a_cell->col = cell_col;
-    a_cell->type = type_cell;
-    return a_cell;
+    if (a_cell != NULL) {
+        a_cell->row = row_p;
+        a_cell->col = col_p;
+        a_cell->type = type_p;
+        return a_cell;
+    }
+    return NULL;
 } // create_cell
 
 /**
 Frees a cell from memory.
-@param a_cell - the cell to be freed from memory
+@param cell_p - the cell to be freed from memory
 */
-void free_cell(cell* a_cell) {
-    free(a_cell);
+void destroy_cell(cell* cell_p) {
+    free(cell_p);
 } // free_cell

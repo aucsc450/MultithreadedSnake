@@ -14,12 +14,15 @@ Creates a board of empty cells.
 */
 board* create_board() {
     board* game_board = malloc(sizeof(board));
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
-            game_board->cells[i][j] = create_cell(i, j, EMPTY);
+    if (game_board != NULL) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                game_board->cells[i][j] = create_cell(i, j, EMPTY);
+            }
         }
+        return game_board;
     }
-    return game_board;
+    return NULL; // not enough space in memory to create a board struct
 } // create_board
 
 /**
@@ -31,7 +34,7 @@ void change_cell_in_board(board* game_board, cell* new_cell) {
     int row = new_cell->row;
     int col = new_cell->col;
     game_board->cells[row][col]->type = new_cell->type;
-    free_cell(new_cell); // we don't need the new cell anymore
+    destroy_cell(new_cell); // we don't need the new cell anymore
 } // change_cell_in_board
 
 /**
@@ -78,7 +81,7 @@ Frees the board from memory, by freeing the individual cells in the board, and t
 void free_board(board* game_board) {
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
-            free_cell(game_board->cells[i][j]);
+            destroy_cell(game_board->cells[i][j]);
         }
     }
     free(game_board);
