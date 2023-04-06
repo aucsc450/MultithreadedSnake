@@ -13,6 +13,7 @@
 #define cell_h
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 // The types that a cell can take
 typedef enum cell_type {

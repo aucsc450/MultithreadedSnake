@@ -18,7 +18,9 @@ game_state* create_game() {
 		game_state_t->buffer = create_bitmap(WIDTH, HEIGHT);
 		game_state_t->game_font = NULL;
 		game_state_t->player = create_snake();
-		enqueue(game_state_t->player, create_cell(SIZE / 2, SIZE / 2, SNAKE));
+		game_state_t->game_board = create_board();
+		enqueue(game_state_t->player, create_cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
+		change_cell_in_board(game_state_t->game_board, create_cell(game_state_t->player->front->cell->row, game_state_t->player->front->cell->col, SNAKE));
 		return game_state_t;
 	}
 	return NULL; // not enough memory to create a new game
@@ -75,6 +77,20 @@ void draw_game_board(BITMAP* buffer, FONT* game_font) {
 	textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d%d", 0, 0, 0);
 } // draw_game_board
 
+void draw_snake(BITMAP* buffer, snake* snake_p) {
+	enqueue(snake_p, create_cell((BOARD_SIZE / 2) - 1, (BOARD_SIZE / 2) - 1, SNAKE));
+	snake_node* temp = snake_p->front;
+	int x_pos = 0;
+	int y_pos = 0;
+	while (temp != NULL) {
+		x_pos = temp->cell->row * TILE_SIZE + X_OFFSET;
+		y_pos = temp->cell->col * TILE_SIZE + Y_OFFSET;
+		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+		temp = temp->next;
+	}
+	free(temp);
+} // draw_snake
+
 void testing_snake_spawning(game_state* game_state_p) {
 	int row = game_state_p->player->front->cell->row; // 7 
 	int col = game_state_p->player->front->cell->col; // 7
@@ -108,5 +124,6 @@ void destroy_game(game_state* game_state_p) {
 	destroy_bitmap(game_state_p->buffer);
 	destroy_font(game_state_p->game_font);
 	destroy_snake(game_state_p->player);
+	destroy_board(game_state_p->game_board);
 	free(game_state_p);
 } // destroy_game

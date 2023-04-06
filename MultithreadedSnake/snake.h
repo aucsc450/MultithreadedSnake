@@ -9,7 +9,6 @@
 #define snake_h
 #include "cell.h"
 #include "direction.h"
-#include <stdbool.h>
 
 #define EMPTY_SNAKE 0
 

@@ -42,7 +42,8 @@ int main(void) {
 	}
 
 	draw_game_board(a_game->buffer, a_game->game_font);
-	testing_snake_spawning(a_game);
+	//testing_snake_spawning(a_game);
+	draw_snake(a_game->buffer, a_game->player);
 	update_screen(a_game->buffer);
 
 	

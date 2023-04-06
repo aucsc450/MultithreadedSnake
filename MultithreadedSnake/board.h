@@ -12,10 +12,9 @@
 #ifndef board_h
 #define board_h
 #include "cell.h"
-#include "boolean.h"
 
 // Constants
-#define BOARD_SIZE 5
+#define BOARD_SIZE 15
 
 // The board struct
 typedef struct board {
@@ -24,9 +23,8 @@ typedef struct board {
 
 // Function definitions
 board* create_board();
-void change_cell_in_board(board* game_board, cell* new_cell);
-boolean generate_apple(board* game_board); // will be called in a specific thread
-void print_board(board* game_board);
-void free_board(board* game_board);
+void change_cell_in_board(board* board_p, cell* cell_p);
+bool generate_apple(board* board_p); // will be called in a specific thread
+void destroy_board(board* board_p);
 
 #endif

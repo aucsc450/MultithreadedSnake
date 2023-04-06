@@ -12,6 +12,7 @@
 #include <allegro.h>
 #include <time.h>
 #include "snake.h"
+#include "board.h"
 
 // Screen Constants
 #define WIDTH 800
@@ -44,12 +45,14 @@ typedef struct game_state {
 	BITMAP* buffer;
 	FONT* game_font;
 	snake* player;
+	board* game_board;
 } game_state;
 
 // Function definitions
 game_state* create_game();
 bool load_game_font(game_state* game_state_p);
 void draw_game_board(BITMAP* buffer, FONT* font);
+void draw_snake(BITMAP* buffer, snake* snake_p);
 void update_screen(BITMAP* buffer);
 void destroy_game(game_state* game_state_p);
 
