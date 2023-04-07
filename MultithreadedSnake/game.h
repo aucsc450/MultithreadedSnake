@@ -56,6 +56,7 @@ private:
 	Board* game_board;
 	Snake* player;
 	bool game_over;
+	direction dir;
 	static volatile int speed_counter;
 	volatile int timer;
 	int total_score;
@@ -71,6 +72,7 @@ public:
 	void reset_game();
 	bool run_game();
 	bool main_menu();
+	Cell* get_next_cell(Cell* curr_position);
 	void run_game_logic();
 	bool play_game();
 	void draw_game_objects();

@@ -21,6 +21,7 @@ Game_State::Game_State() {
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	player->grow(new Cell(BOARD_SIZE / 2 - 1, BOARD_SIZE / 2, SNAKE));
 	game_over = false;
+	dir = LEFT;
 	speed_counter = 0;
 	timer = 0;
 	total_score = 0;
@@ -143,6 +144,27 @@ bool Game_State::main_menu() {
 	} // while
 } // main_menu
 
+Cell* Game_State::get_next_cell(Cell* curr_position) {
+	int row = curr_position->get_row();
+	int col = curr_position->get_col();
+	switch (dir) {
+		case LEFT:
+			col--;
+			break;
+		case RIGHT:
+			col++;
+			break;
+		case UP:
+			row--;
+			break;
+		case DOWN:
+			row++;
+			break;
+	}
+	Cell* next_cell = game_board->get_specific_cell(row, col);
+	return next_cell;
+} // get_next_cell
+
 /*
 Runs the following methods associated with the game logic, such as moving the player, fish, and trash sprites,
 getting input from the user, and ensuring that all sprites are not out of bounds.
@@ -259,7 +281,6 @@ void Game_State::draw_snake() {
 		//textprintf_ex(buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
 		temp = temp->get_next();
 	}
-
 } // draw_snake
 
 /*
