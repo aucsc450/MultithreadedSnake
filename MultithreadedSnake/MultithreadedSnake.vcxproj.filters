@@ -44,9 +44,6 @@
     <ClInclude Include="game.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="fruit.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="queue.h">
       <Filter>Source Files</Filter>
     </ClInclude>

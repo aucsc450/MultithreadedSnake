@@ -16,6 +16,7 @@ Constructs a new instance of the game class, and initializes all variables.
 Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
+	game_board = new Board();
 	game_over = false;
 	speed_counter = 0;
 	timer = 0;
@@ -192,8 +193,8 @@ void Game_State::draw_game_board() {
 	rectfill(buffer, 0, 0, WIDTH, HEIGHT, BROWN);
 	rectfill(buffer, start_x, start_y, end_x, end_y, KELLY_GREEN);
 	bool swap_colour = false;
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE; j++) {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
 			if (!swap_colour) {
 				rectfill(buffer, start_x, start_y, end_x, end_y, KELLY_GREEN);
 				swap_colour = true;
@@ -202,6 +203,11 @@ void Game_State::draw_game_board() {
 				rectfill(buffer, start_x, start_y, end_x, end_y, DARK_LEMON_LIME);
 				swap_colour = false;
 			}
+
+			// For testing purposes
+			textprintf_centre_ex(buffer, font, start_x + 25, start_y, WHITE, -1, "(%d, %d)", game_board->get_specific_cell(i, j)->get_row(), game_board->get_specific_cell(i, j)->get_col());
+
+
 			start_x += TILE_SIZE;
 			end_x += TILE_SIZE;
 		} // inner for

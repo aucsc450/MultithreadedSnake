@@ -145,7 +145,6 @@
     <ClInclude Include="board.h" />
     <ClInclude Include="cell.h" />
     <ClInclude Include="direction.h" />
-    <ClInclude Include="fruit.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="multithreadedsnake.h" />
     <ClInclude Include="node.h" />

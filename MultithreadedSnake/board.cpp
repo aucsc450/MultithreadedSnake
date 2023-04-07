@@ -30,3 +30,33 @@ Cell* Board::get_specific_cell(int row, int col) {
 void Board::set_type_for_specific_cell(int row, int col, cell_type type_p) {
 	cells[row][col]->set_type(type_p);
 } // set_type_for_specific_cell
+
+void Board::generate_food() {
+	int rand_row = 0;
+	int rand_col = 0;
+	while (true) {
+		rand_row = rand() % BOARD_SIZE;
+		rand_col = rand() % BOARD_SIZE;
+		if (cells[rand_row][rand_col]->get_type() != SNAKE) {
+			break; // found an empty cell
+		}
+	} // while
+	cells[rand_row][rand_col]->set_type(APPLE);
+} // generate_food
+
+void Board::to_output() {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (cells[i][j]->get_type() == EMPTY) {
+				printf("EMPTY ");
+			}
+			else if (cells[i][j]->get_type() == APPLE) {
+				printf("APPLE ");
+			}
+			else {
+				printf("SNAKE ");
+			}
+		} // inner for
+		printf("\n");
+	} // outer for
+} // to_output

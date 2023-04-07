@@ -10,7 +10,7 @@
 #define game_h
 
 #include <allegro.h>
-#include <time.h>
+#include "board.h"
 
 //#include "snake.h"
 //#include "board.h"
@@ -55,6 +55,7 @@ class Game_State {
 private:
 	BITMAP* buffer;
 	FONT* game_font;
+	Board* game_board;
 	//snake* player;
 	//board* game_board;
 	bool game_over;

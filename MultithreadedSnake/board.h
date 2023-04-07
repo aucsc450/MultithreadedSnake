@@ -12,6 +12,8 @@
 #ifndef board_h
 #define board_h
 #include "cell.h"
+#include <time.h>
+#include <stdio.h>
 
 // Constants
 #define BOARD_SIZE 15
@@ -24,6 +26,8 @@ public:
     ~Board();
     Cell* get_specific_cell(int row, int col);
     void set_type_for_specific_cell(int row, int col, cell_type type_p);
+    void generate_food();
+    void to_output();
 };
 
 #endif
