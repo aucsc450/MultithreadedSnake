@@ -133,22 +133,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="board.c" />
-    <ClCompile Include="cell.c" />
-    <ClCompile Include="fruit.c" />
-    <ClCompile Include="game.c" />
-    <ClCompile Include="multithreadedsnake.c" />
-    <ClCompile Include="queue.c" />
-    <ClCompile Include="snake.c" />
+    <ClCompile Include="board.cpp" />
+    <ClCompile Include="cell.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="multithreadedsnake.cpp" />
+    <ClCompile Include="node.cpp" />
+    <ClCompile Include="queue.cpp" />
+    <ClCompile Include="snake.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
-    <ClInclude Include="boolean.h" />
     <ClInclude Include="cell.h" />
     <ClInclude Include="direction.h" />
     <ClInclude Include="fruit.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="multithreadedsnake.h" />
+    <ClInclude Include="node.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="snake.h" />
   </ItemGroup>

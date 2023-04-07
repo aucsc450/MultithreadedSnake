@@ -7,29 +7,21 @@
 */
 #ifndef snake_h
 #define snake_h
-#include "cell.h"
+#include "queue.h"
 #include "direction.h"
 
 #define EMPTY_SNAKE 0
 
-// The node struct containing data
-typedef struct snake_node {
-    cell* cell;
-    struct snake_node* next;
-} snake_node;
-
-// The queue struct (the snake will be a queue)
-typedef struct snake {
-    snake_node* front;
-    snake_node* rear;
-    int size;
-} snake;
-
-// Function definitions
-snake* create_snake();
-bool is_empty(snake* snake_p);
-bool enqueue(snake* snake_p, cell* cell_p);
-snake_node* dequeue(snake* snake_p);
-void destroy_snake(snake* snake_p);
+class Snake {
+private:
+	Queue* snake;
+public:
+	Snake();
+	~Snake();
+	Queue* get_snake();
+	void grow(Cell* cell_p);
+	void move(Cell* next_cell);
+	bool collided(Cell* next_cell);
+};
 
 #endif

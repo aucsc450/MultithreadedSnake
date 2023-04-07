@@ -1,5 +1,5 @@
 /**
-* File: cell.h
+* File: node.h
 *
 * Author: Anjola Aina
 * Last Modified: Thursday, April 6th, 2023
@@ -9,35 +9,26 @@
 * There also exists an enum called cell_type, which determines what "object" is occupying the cell.
 * To map the enum to its equivalent string, the following source was used to help achieve this: https://www.linkedin.com/pulse/mapping-enum-string-c-language-sathishkumar-duraisamy/
 */
-#ifndef cell_h
-#define cell_h
+#ifndef node_h
+#define node_h
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include "cell.h"
 
-// The types that a cell can take
-typedef enum cell_type {
-    EMPTY,
-    APPLE,
-    SNAKE
-} cell_type; 
 
-class Cell {
+class Node {
 private:
-    int row;
-    int col;
-    cell_type type;
+    Cell* data;
+    Node* next;
 public:
-    Cell(int row_p, int col_p, cell_type type_p);
-    Cell(int row_p, int col_p);
-    Cell();
-    ~Cell();
-    int get_row();
-    int get_col();
-    cell_type get_type();
-    void set_type(cell_type new_type);
-    void set_cell(int new_row, int new_col, cell_type new_type);
-    bool same_cell(Cell* cell_p);
+    Node(int row_p, int col_p, cell_type type_p);
+    Node(Cell* cell_p);
+    Node();
+    ~Node();
+    Cell* get_data();
+    Node* get_next();
+    void set_data(Cell* data_p);
+    void set_next(Node* next_p);
 };
 
 #endif
