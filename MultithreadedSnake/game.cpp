@@ -21,7 +21,8 @@ Game_State::Game_State() {
 	speed_counter = 0;
 	timer = 0;
 	total_score = 0;
-	time_elasped = 0;
+	seconds_elasped = 0;
+	minutes_elasped = 0;
 	LOCK_VARIABLE(speed_counter);
 	LOCK_FUNCTION(increment_speed_counter);
 } // constructor
@@ -92,7 +93,8 @@ void Game_State::reset_game() {
 	speed_counter = 0;
 	timer = 0;
 	total_score = 0;
-	time_elasped = 0;
+	seconds_elasped = 0;
+	minutes_elasped = 0;
 } // reset_game
 
 /*
@@ -152,6 +154,7 @@ Runs the actual game.
 */
 bool Game_State::play_game() {
 	bool pressed_esc = false;
+	bool skip_timer = true;
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
@@ -164,6 +167,12 @@ bool Game_State::play_game() {
 			game_over = true;
 			pressed_esc = true;
 		}
+
+		// Determining how long the player has played for currently
+		seconds_elasped = (timer / FPS) % FPS;
+		minutes_elasped = (timer / FPS) / FPS;
+		
+		// Updating the screen
 		draw_game_board();
 		update_screen();
 		// draw_game_objects();
@@ -204,8 +213,8 @@ void Game_State::draw_game_board() {
 				swap_colour = false;
 			}
 
-			// For testing purposes
-			textprintf_centre_ex(buffer, font, start_x + 25, start_y, WHITE, -1, "(%d, %d)", game_board->get_specific_cell(i, j)->get_row(), game_board->get_specific_cell(i, j)->get_col());
+			// For testing purposes - delete later
+			// textprintf_centre_ex(buffer, font, start_x + 25, start_y, WHITE, -1, "(%d, %d)", game_board->get_specific_cell(i, j)->get_row(), game_board->get_specific_cell(i, j)->get_col());
 
 
 			start_x += TILE_SIZE;
@@ -225,8 +234,17 @@ void Game_State::draw_game_board() {
 	textout_right_ex(buffer, font, "Made by Anjola Aina", WIDTH - 20, HEIGHT - 15, WHITE, -1);
 	textprintf_ex(buffer, game_font, 25, 25, WHITE, -1, "Score: %d", total_score);
 	textout_right_ex(buffer, game_font, "Stop - ESC", WIDTH - 25, 25, WHITE, -1);
-	textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d", time_elasped);
+	if (seconds_elasped < 10) {
+		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : 0%d", minutes_elasped, seconds_elasped);
+	}
+	else {
+		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d", minutes_elasped, seconds_elasped);
+	}
 } // draw_game_board
+
+void Game_State::draw_snake() {
+
+} // draw_snake
 
 /*
 Increases the speed counter, which is used to update / move the objects in the game.

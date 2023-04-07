@@ -62,7 +62,8 @@ private:
 	static volatile int speed_counter;
 	volatile int timer;
 	int total_score;
-	int time_elasped;
+	int seconds_elasped;
+	int minutes_elasped;
 public:
 	Game_State();
 	~Game_State();
@@ -77,6 +78,7 @@ public:
 	bool play_game();
 	void draw_game_objects();
 	void draw_game_board();
+	void draw_snake();
 	void update_screen();
 	static void increment_speed_counter();
 };
