@@ -11,9 +11,7 @@
 
 #include <allegro.h>
 #include "board.h"
-
-//#include "snake.h"
-//#include "board.h"
+#include "snake.h"
 
 // Screen Constants
 #define WIDTH 800
@@ -56,8 +54,7 @@ private:
 	BITMAP* buffer;
 	FONT* game_font;
 	Board* game_board;
-	//snake* player;
-	//board* game_board;
+	Snake* player;
 	bool game_over;
 	static volatile int speed_counter;
 	volatile int timer;

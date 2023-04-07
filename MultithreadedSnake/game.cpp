@@ -17,6 +17,9 @@ Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
 	game_board = new Board();
+	player = new Snake();
+	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
+	player->grow(new Cell(BOARD_SIZE / 2 - 1, BOARD_SIZE / 2, SNAKE));
 	game_over = false;
 	speed_counter = 0;
 	timer = 0;
@@ -174,6 +177,7 @@ bool Game_State::play_game() {
 		
 		// Updating the screen
 		draw_game_board();
+		draw_snake();
 		update_screen();
 		// draw_game_objects();
 		
@@ -243,6 +247,18 @@ void Game_State::draw_game_board() {
 } // draw_game_board
 
 void Game_State::draw_snake() {
+	Node* temp = player->get_snake()->get_front();
+	textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "Size of snake: %d", player->get_snake()->get_size());
+	while (temp != NULL) {
+		int row = temp->get_data()->get_row();
+		int col = temp->get_data()->get_col();
+		int x_pos = (row * TILE_SIZE) + X_OFFSET;
+		int y_pos = (col * TILE_SIZE) + Y_OFFSET;
+		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+		//textprintf_ex(buffer, font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", row, col);
+		//textprintf_ex(buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
+		temp = temp->get_next();
+	}
 
 } // draw_snake
 
