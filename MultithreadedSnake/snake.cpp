@@ -27,6 +27,9 @@ void Snake::grow(Cell* cell_p) {
 } // grow
 
 void Snake::move(Cell* next_cell) {
+	// 1. Dequeue the front of the snake.
+	// 2. If snake is empty, then set tail to be empty, enqeue the next cell, and terminate.
+	//  3. otherwise, set the tail to be empty, enqueue the next cell, and go back to step one.
 	Cell* snake_tail = snake->dequeue()->get_data();
 	snake_tail->set_type(EMPTY);
 	snake->enqueue(next_cell);

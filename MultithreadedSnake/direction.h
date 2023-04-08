@@ -13,7 +13,8 @@ typedef enum direction {
     LEFT,
     RIGHT,
     UP,
-    DOWN
+    DOWN,
+    NONE
 } direction;
 
 #endif

@@ -19,9 +19,9 @@ Game_State::Game_State() {
 	game_board = new Board();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	player->grow(new Cell(BOARD_SIZE / 2 - 1, BOARD_SIZE / 2, SNAKE));
+	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2 - 1, SNAKE));
 	game_over = false;
-	dir = LEFT;
+	dir = NONE;
 	speed_counter = 0;
 	timer = 0;
 	total_score = 0;
@@ -147,7 +147,10 @@ bool Game_State::main_menu() {
 Cell* Game_State::get_next_cell(Cell* curr_position) {
 	int row = curr_position->get_row();
 	int col = curr_position->get_col();
-	switch (dir) {
+	if (dir == LEFT) {
+		col--;
+	}
+	/*switch (dir) {
 		case LEFT:
 			col--;
 			break;
@@ -160,17 +163,42 @@ Cell* Game_State::get_next_cell(Cell* curr_position) {
 		case DOWN:
 			row++;
 			break;
-	}
+	}*/
 	Cell* next_cell = game_board->get_specific_cell(row, col);
 	return next_cell;
 } // get_next_cell
+
+void Game_State::handle_keyboard_input() {
+	clear_keybuf();
+	if (key[KEY_LEFT]) {
+		dir = LEFT;
+	}
+	else if (key[KEY_RIGHT]) {
+		dir = RIGHT;
+	}
+	else if (key[KEY_UP]) {
+		dir = UP;
+	}
+	else if (key[KEY_DOWN]) {
+		dir = DOWN;
+	}
+	else {
+		dir = NONE;
+	}
+} // handle_keyboard_input
 
 /*
 Runs the following methods associated with the game logic, such as moving the player, fish, and trash sprites,
 getting input from the user, and ensuring that all sprites are not out of bounds.
 */
 void Game_State::run_game_logic() {
-
+	handle_keyboard_input();
+	if (dir != NONE) {
+		Cell* curr_position = player->get_snake()->get_front()->get_data();
+		Cell* next_cell = get_next_cell(curr_position);
+		player->move(next_cell);
+		dir = NONE;
+	}
 } // run_game_logic
 
 /*
@@ -180,11 +208,14 @@ Runs the actual game.
 bool Game_State::play_game() {
 	bool pressed_esc = false;
 	bool skip_timer = true;
+	int test = 0;
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
-			run_game_logic();
 			timer++;
+			if (timer % 10 == 0) {
+				run_game_logic();
+			}
 		} // inner while
 
 		// Game is over if the user has pressed the ESC key
@@ -200,6 +231,7 @@ bool Game_State::play_game() {
 		// Updating the screen
 		draw_game_board();
 		draw_snake();
+		textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "TEST: %d", test);
 		update_screen();
 		// draw_game_objects();
 		
@@ -270,15 +302,15 @@ void Game_State::draw_game_board() {
 
 void Game_State::draw_snake() {
 	Node* temp = player->get_snake()->get_front();
-	textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "Size of snake: %d", player->get_snake()->get_size());
+	// textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "Direction of snake: %d", dir);
 	while (temp != NULL) {
 		int row = temp->get_data()->get_row();
 		int col = temp->get_data()->get_col();
-		int x_pos = (row * TILE_SIZE) + X_OFFSET;
-		int y_pos = (col * TILE_SIZE) + Y_OFFSET;
+		int x_pos = (col * TILE_SIZE) + X_OFFSET;
+		int y_pos = (row * TILE_SIZE) + Y_OFFSET;
 		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
-		//textprintf_ex(buffer, font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", row, col);
-		//textprintf_ex(buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
+		textprintf_ex(buffer, font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", row, col);
+		textprintf_ex(buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
 		temp = temp->get_next();
 	}
 } // draw_snake

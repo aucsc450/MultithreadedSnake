@@ -73,6 +73,7 @@ public:
 	bool run_game();
 	bool main_menu();
 	Cell* get_next_cell(Cell* curr_position);
+	void handle_keyboard_input();
 	void run_game_logic();
 	bool play_game();
 	void draw_game_objects();
