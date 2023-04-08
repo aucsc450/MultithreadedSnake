@@ -32,6 +32,7 @@
 #define VOLUME 32
 #define PANNING 32
 #define FREQUENCY 1000
+#define SLOW_MOVEMENT_DOWN 10
 #define MAX_SCORE_LEN 12 // max int digits = 10 + 1 to account for the '\0' (null) character and + 1 for the '-' character
 #define MAX_TIME_LEN 3
 

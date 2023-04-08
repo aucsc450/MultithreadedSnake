@@ -18,8 +18,8 @@ Game_State::Game_State() {
 	game_font = NULL;
 	game_board = new Board();
 	player = new Snake();
-	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2 - 1, SNAKE));
+	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	game_over = false;
 	dir = NONE;
 	speed_counter = 0;
@@ -147,10 +147,7 @@ bool Game_State::main_menu() {
 Cell* Game_State::get_next_cell(Cell* curr_position) {
 	int row = curr_position->get_row();
 	int col = curr_position->get_col();
-	if (dir == LEFT) {
-		col--;
-	}
-	/*switch (dir) {
+	switch (dir) {
 		case LEFT:
 			col--;
 			break;
@@ -163,7 +160,7 @@ Cell* Game_State::get_next_cell(Cell* curr_position) {
 		case DOWN:
 			row++;
 			break;
-	}*/
+	}
 	Cell* next_cell = game_board->get_specific_cell(row, col);
 	return next_cell;
 } // get_next_cell
@@ -213,7 +210,7 @@ bool Game_State::play_game() {
 		while (speed_counter > 0) {
 			speed_counter--;
 			timer++;
-			if (timer % 10 == 0) {
+			if (timer % SLOW_MOVEMENT_DOWN == 0) { // this slows down the game logic so that it executes less frequently
 				run_game_logic();
 			}
 		} // inner while
