@@ -101,6 +101,7 @@ void Game_State::reset_game() {
 	minutes_elasped = 0;
 	player->reset();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
+	game_board->generate_food();
 } // reset_game
 
 /*
@@ -222,6 +223,7 @@ void Game_State::run_game_logic() {
 		if (next_cell->get_type() == APPLE) {
 			player->grow(curr_position);
 			next_cell->set_type(EMPTY);
+			total_score += 100;
 		}
 		dir = NONE;
 	}

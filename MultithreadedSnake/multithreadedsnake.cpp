@@ -12,6 +12,7 @@
 The entry point of the game.
 */
 int main(void) {
+	srand(time(NULL));
 	if (allegro_init() != 0) {
 		return 1;
 	}
