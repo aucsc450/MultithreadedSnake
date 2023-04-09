@@ -75,11 +75,13 @@ public:
 	bool main_menu();
 	Cell* get_next_cell(Cell* curr_position);
 	void handle_keyboard_input();
+	bool is_snake_out_of_bounds(int row, int col);
 	void run_game_logic();
 	bool play_game();
 	void draw_game_objects();
 	void draw_game_board();
 	void draw_snake();
+	bool end_game_menu();
 	void update_screen();
 	static void increment_speed_counter();
 };

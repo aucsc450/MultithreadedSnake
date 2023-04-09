@@ -119,6 +119,10 @@ bool Game_State::run_game() {
 	if (game_ended) {
 		return false; // game is over
 	}
+	bool pressed_esc = end_game_menu();
+	if (pressed_esc) {
+		return false; // game is over
+	}
 	return true; // the player wants to play the game again
 } // run_game
 
@@ -161,6 +165,9 @@ Cell* Game_State::get_next_cell(Cell* curr_position) {
 			row++;
 			break;
 	}
+	if (is_snake_out_of_bounds(row, col)) {  
+		return NULL;
+	}
 	Cell* next_cell = game_board->get_specific_cell(row, col);
 	return next_cell;
 } // get_next_cell
@@ -184,6 +191,13 @@ void Game_State::handle_keyboard_input() {
 	}
 } // handle_keyboard_input
 
+bool Game_State::is_snake_out_of_bounds(int row, int col) {
+	if (row < 0 || row > BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+		return true;
+	}
+	return false;
+} // is_snake_out_of_bounds
+
 /*
 Runs the following methods associated with the game logic, such as moving the player, fish, and trash sprites,
 getting input from the user, and ensuring that all sprites are not out of bounds.
@@ -193,6 +207,10 @@ void Game_State::run_game_logic() {
 	if (dir != NONE) {
 		Cell* curr_position = player->get_snake()->get_front()->get_data();
 		Cell* next_cell = get_next_cell(curr_position);
+		if (next_cell == NULL) {
+			game_over = true;
+			return;
+		}
 		player->move(next_cell);
 		dir = NONE;
 	}
@@ -213,6 +231,7 @@ bool Game_State::play_game() {
 			if (timer % SLOW_MOVEMENT_DOWN == 0) { // this slows down the game logic so that it executes less frequently
 				run_game_logic();
 			}
+			
 		} // inner while
 
 		// Game is over if the user has pressed the ESC key
@@ -311,6 +330,29 @@ void Game_State::draw_snake() {
 		temp = temp->get_next();
 	}
 } // draw_snake
+
+/*
+Displays the end game menu.
+@param background - the static background
+@return - true if the escape key was pressed, false if the enter key was pressed
+*/
+bool Game_State::end_game_menu() {
+	clear_bitmap(buffer);
+	draw_game_board();
+	textout_centre_ex(buffer, game_font, "Uh oh, the Game has ended!", WIDTH / 2, HEIGHT / 2 - 25, WHITE, -1);
+	textout_centre_ex(buffer, game_font, "Press ENTER to play again or ESC to exit the game!", WIDTH / 2, HEIGHT / 2, WHITE, -1);
+	update_screen();
+	while (true) {
+		clear_keybuf();
+		if (key[KEY_ESC]) {
+			return true;
+		}
+		if (key[KEY_ENTER]) {
+			key[KEY_ENTER] = 0; // so that the user can press the key again
+			return false; // the enter key was pressed
+		}
+	} // while
+} // end_game_menu
 
 /*
 Increases the speed counter, which is used to update / move the objects in the game.
