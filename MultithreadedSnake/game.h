@@ -21,6 +21,7 @@
 #define WHITE makecol(255, 255, 255)
 #define GREY makecol(127, 127, 127) 
 #define BLACK makecol(0, 0, 0)
+#define APPLE_RED makecol(255, 8 ,0)
 #define KELLY_GREEN makecol(95, 195, 20)
 #define DARK_LEMON_LIME makecol(121, 208, 33)
 #define FOREST_BROWN makecol(63, 48, 29)
@@ -81,6 +82,7 @@ public:
 	void draw_game_objects();
 	void draw_game_board();
 	void draw_snake();
+	void draw_apple();
 	bool end_game_menu();
 	void update_screen();
 	static void increment_speed_counter();

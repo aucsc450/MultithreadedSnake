@@ -17,6 +17,7 @@ Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
 	game_board = new Board();
+	game_board->generate_food();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	game_over = false;
@@ -253,6 +254,7 @@ bool Game_State::play_game() {
 		// Updating the screen
 		draw_game_board();
 		draw_snake();
+		draw_apple();
 		textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "TEST: %d", test);
 		update_screen();
 		// draw_game_objects();
@@ -292,7 +294,6 @@ void Game_State::draw_game_board() {
 				rectfill(buffer, start_x, start_y, end_x, end_y, DARK_LEMON_LIME);
 				swap_colour = false;
 			}
-
 			// For testing purposes - delete later
 			// textprintf_centre_ex(buffer, font, start_x + 25, start_y, WHITE, -1, "(%d, %d)", game_board->get_specific_cell(i, j)->get_row(), game_board->get_specific_cell(i, j)->get_col());
 
@@ -336,6 +337,19 @@ void Game_State::draw_snake() {
 		temp = temp->get_next();
 	}
 } // draw_snake
+
+void Game_State::draw_apple() {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (game_board->get_specific_cell(i, j)->get_type() == APPLE) {
+				int x_pos = (j * TILE_SIZE) + X_OFFSET;
+				int y_pos = (i * TILE_SIZE) + Y_OFFSET;
+				rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, APPLE_RED);
+			}
+		}
+	}
+	
+}
 
 /*
 Displays the end game menu.
