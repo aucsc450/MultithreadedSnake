@@ -18,7 +18,6 @@ Game_State::Game_State() {
 	game_font = NULL;
 	game_board = new Board();
 	player = new Snake();
-	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2 - 1, SNAKE));
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	game_over = false;
 	dir = NONE;
@@ -99,6 +98,8 @@ void Game_State::reset_game() {
 	total_score = 0;
 	seconds_elasped = 0;
 	minutes_elasped = 0;
+	player->reset();
+	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 } // reset_game
 
 /*
@@ -208,6 +209,11 @@ void Game_State::run_game_logic() {
 		Cell* curr_position = player->get_snake()->get_front()->get_data();
 		Cell* next_cell = get_next_cell(curr_position);
 		if (next_cell == NULL) {
+			game_over = true;
+			return;
+		}
+		bool snake_collision = player->collided(next_cell);
+		if (snake_collision) {
 			game_over = true;
 			return;
 		}

@@ -22,6 +22,7 @@ public:
 	void grow(Cell* cell_p);
 	void move(Cell* next_cell);
 	bool collided(Cell* next_cell);
+	void reset();
 };
 
 #endif

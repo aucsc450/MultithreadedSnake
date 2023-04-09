@@ -54,3 +54,10 @@ bool Snake::collided(Cell* next_cell) {
 	} // while
 	return false;
 } // collided 
+
+void Snake::reset() {
+	Node* temp;
+	while (!snake->is_empty()) {
+		temp = snake->dequeue();
+	} // while
+} // reset
