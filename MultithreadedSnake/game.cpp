@@ -219,6 +219,10 @@ void Game_State::run_game_logic() {
 			return;
 		}
 		player->move(next_cell);
+		if (next_cell->get_type() == APPLE) {
+			player->grow(curr_position);
+			next_cell->set_type(EMPTY);
+		}
 		dir = NONE;
 	}
 } // run_game_logic
