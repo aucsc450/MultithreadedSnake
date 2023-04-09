@@ -381,14 +381,6 @@ bool Game_State::end_game_menu() {
 } // end_game_menu
 
 /*
-Increases the speed counter, which is used to update / move the objects in the game.
-*/
-void Game_State::increment_speed_counter() {
-	speed_counter++;
-} // increment_speed_counter
-END_OF_FUNCTION(increment_speed_counter);
-
-/*
 The new thread function that updates the screen. It works the same way the update_screen() function used to work, with the
 only difference being is that another thread executes it.
 @param game_buffer - the double buffer of the game (represented as a void pointer)
@@ -398,3 +390,21 @@ void Game_State::update_screen() {
 	blit(buffer, screen, 0, 0, 0, 0, WIDTH, HEIGHT);
 	release_screen();
 } // update_screen
+
+/*
+Increases the speed counter, which is used to update / move the objects in the game.
+*/
+void Game_State::increment_speed_counter() {
+	speed_counter++;
+} // increment_speed_counter
+END_OF_FUNCTION(increment_speed_counter);
+
+pthread_t Game_State::create_pthread(void* (*thread_function) (void*), void* param) {
+	pthread_t thread_id;
+	pthread_create(&thread_id, NULL, thread_function, param);
+	return thread_id;
+} // create_pthread
+
+void Game_State::join_pthread(pthread_t thread_id, void** return_val) {
+	pthread_join(thread_id, return_val);
+} // join_pthread

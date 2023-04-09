@@ -10,6 +10,7 @@
 #define game_h
 
 #include <allegro.h>
+#include <pthread.h>
 #include "board.h"
 #include "snake.h"
 
@@ -86,6 +87,8 @@ public:
 	bool end_game_menu();
 	void update_screen();
 	static void increment_speed_counter();
+	static pthread_t create_pthread(void* (*thread_function) (void*), void* param);
+	static void join_pthread(pthread_t thread_id, void** return_val);
 };
 
 #endif
