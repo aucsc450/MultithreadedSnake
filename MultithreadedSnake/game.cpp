@@ -269,6 +269,7 @@ bool Game_State::play_game() {
 		// Game is over if the user has pressed the ESC key
 		if (key[KEY_ESC]) {
 			game_over = true;
+			join_pthread(apple_thread, NULL);
 			pressed_esc = true;
 		}
 		// Determining how long the player has played for currently
@@ -283,7 +284,6 @@ bool Game_State::play_game() {
 		// draw_game_objects();
 	} // game loop
 
-	join_pthread(apple_thread, NULL);
 	remove_int(increment_speed_counter); // removing the interrupt handler as we don't need it anymore
 	return pressed_esc;
 } // play_game
