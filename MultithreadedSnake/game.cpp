@@ -17,7 +17,7 @@ Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
 	game_board = new Board();
-	game_board->generate_food();
+	game_board->generate_apple();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	game_over = false;
@@ -101,7 +101,7 @@ void Game_State::reset_game() {
 	minutes_elasped = 0;
 	player->reset();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	game_board->generate_food();
+	game_board->generate_apple();
 } // reset_game
 
 /*

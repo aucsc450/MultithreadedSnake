@@ -2,7 +2,7 @@
 * File: multithreadedsnake.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Wednesday, April 4th, 2023
+* Last Modified: Sunday, April 9th, 2023
 *
 * This file runs the game.
 */

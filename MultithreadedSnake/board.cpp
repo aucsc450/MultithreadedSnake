@@ -2,15 +2,15 @@
 * File: board.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Thursday, April 6th, 2023
+* Last Modified: Sunday, April 9th, 2023
 *
-* This file contains the board struct, which represents the game board of snake.
-* It is BOARD_SIZE * BOARD_SIZE large (a square), and consists of cells defined in the cell.h file and implemented in its respective .c file.
-* There are functions to create and destroy the board, as well as a function to change a cell in the board.
-* Initially, the board is empty.
+* This file implements the Board class defined in its respective .h file.
 */
 #include "board.h"
 
+/**
+Creates a new board of cells that are all empty.
+*/
 Board::Board() {
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
@@ -19,19 +19,37 @@ Board::Board() {
 	}
 } // constructor
 
+/**
+Destroys the board.
+*/
 Board::~Board() {
 	delete[] *cells;
 } // destructor
 
+/**
+Gets a specific cell in the board.
+@param row - row index of cell to obtain
+@param col - col index of cell to obtain
+@return - the cell in the board indicated by the row and column indices
+*/
 Cell* Board::get_specific_cell(int row, int col) {
 	return cells[row][col];
 } // get_specific_cell
 
+/**
+Sets the type for a specific cell.
+@param row - row index
+@param col - col index
+@param type_p - new type of the cell at the specificed row and column
+*/
 void Board::set_type_for_specific_cell(int row, int col, cell_type type_p) {
 	cells[row][col]->set_type(type_p);
 } // set_type_for_specific_cell
 
-void Board::generate_food() {
+/**
+Generates an apple at a random location.
+*/
+void Board::generate_apple() {
 	int rand_row = 0;
 	int rand_col = 0;
 	while (true) {
@@ -43,20 +61,3 @@ void Board::generate_food() {
 	} // while
 	cells[rand_row][rand_col]->set_type(APPLE);
 } // generate_food
-
-void Board::to_output() {
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (cells[i][j]->get_type() == EMPTY) {
-				printf("EMPTY ");
-			}
-			else if (cells[i][j]->get_type() == APPLE) {
-				printf("APPLE ");
-			}
-			else {
-				printf("SNAKE ");
-			}
-		} // inner for
-		printf("\n");
-	} // outer for
-} // to_output
