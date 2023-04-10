@@ -2,30 +2,45 @@
 * File: snake.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Thursday, April 6th, 2023
+* Last Modified: Sunday, April 9th, 2023
 *
-* This file contains the board struct, which represents the game board of snake.
-* It is BOARD_SIZE * BOARD_SIZE large (a square), and consists of cells defined in the cell.h file and implemented in its respective .c file.
-* There are functions to create and destroy the board, as well as a function to change a cell in the board.
-* Initially, the board is empty.
+* This file implements the snake class defined in its respective .h file.
 */
 #include "snake.h"
 
+/**
+Creates a new snake that is initially empty.
+*/
 Snake::Snake() {
 	snake = new Queue();
 } // constructor
 
+/**
+Destroys a snake. It relies on the queue destructor to destroy the snake.
+*/
 Snake::~Snake() {
 } // destructor
 
+/**
+Gets the snake (represented as a queue).
+@return - the queue representing the snake
+*/
 Queue* Snake::get_snake() {
 	return snake;
 } // get_snake
 
+/**
+Grows the snake by enqueuing a new node.
+@param cell_p - the data of the new node to be enqueued to the snake.
+*/
 void Snake::grow(Cell* cell_p) {
 	snake->enqueue(cell_p);
 } // grow
 
+/**
+Moves all nodes in the snake.
+@param next_cell - the cell containing the new row and column values of the snake's head
+*/
 void Snake::move(Cell* next_cell) {
 	int num_passes = 0;
 	while (true) {
@@ -42,6 +57,11 @@ void Snake::move(Cell* next_cell) {
 	} // while
 } // move
 
+/**
+Checks whether the snake has collided with itself.
+@param next_cell - the cell containing the new row and column values of the snake's head
+@return - true if the snake has collided with its body, false otherwise
+*/
 bool Snake::collided(Cell* next_cell) {
 	Node* temp = snake->get_front();
 	Cell* cell_t;
@@ -55,6 +75,9 @@ bool Snake::collided(Cell* next_cell) {
 	return false;
 } // collided 
 
+/**
+Resets the snake by dequeueing every current node in the snake.
+*/
 void Snake::reset() {
 	Node* temp;
 	while (!snake->is_empty()) {

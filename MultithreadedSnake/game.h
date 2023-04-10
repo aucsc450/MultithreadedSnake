@@ -2,9 +2,9 @@
 * File: game.h
 *
 * Author: Anjola Aina
-* Last Modified: Tuesday, April 4th, 2023
+* Last Modified: Sunday, April 9th, 2023
 *
-* This file defines the game struct, which contains the objects that are relevant to the game. The functions defined in this file control the execution of the game.
+* This file defines the game_state class, which contains the objects and functions controlling the execution of the game.
 */
 #ifndef game_h
 #define game_h
