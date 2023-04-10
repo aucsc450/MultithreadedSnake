@@ -9,6 +9,7 @@
 #ifndef game_h
 #define game_h
 
+#define HAVE_STRUCT_TIMESPEC
 #include <allegro.h>
 #include <pthread.h>
 #include "board.h"

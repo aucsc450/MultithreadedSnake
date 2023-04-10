@@ -2,9 +2,9 @@
 * File: game.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Tuesday, April 4th, 2023
+* Last Modified: Sunday, April 9th, 2023
 *
-* This file implements the game struct and its associated functions.
+* This file implements the game_state class.
 */
 #include "game.h"
 
@@ -151,6 +151,11 @@ bool Game_State::main_menu() {
 	} // while
 } // main_menu
 
+/**
+Returns the next position that the snake is to move to.
+@param curr_position - the current position of the snake (including the row and column)
+@return - a cell consisting of the updated row and column positions for the snake to go to
+*/
 Cell* Game_State::get_next_cell(Cell* curr_position) {
 	int row = curr_position->get_row();
 	int col = curr_position->get_col();
@@ -175,6 +180,9 @@ Cell* Game_State::get_next_cell(Cell* curr_position) {
 	return next_cell;
 } // get_next_cell
 
+/**
+Handles keyboard input by changing the direction of the snake based on what key the user presses.
+*/
 void Game_State::handle_keyboard_input() {
 	clear_keybuf();
 	if (key[KEY_LEFT]) {
