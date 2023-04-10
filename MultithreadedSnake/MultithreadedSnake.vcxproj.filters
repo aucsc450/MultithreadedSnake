@@ -15,16 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="multithreadedsnake.c">
+    <ClCompile Include="multithreadedsnake.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game.c">
+    <ClCompile Include="game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="snake.c">
+    <ClCompile Include="cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fruit.c">
+    <ClCompile Include="node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="snake.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,11 +44,26 @@
     <ClInclude Include="game.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="queue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cell.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="direction.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="board.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="snake.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="fruit.h">
+    <ClInclude Include="node.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphics\franklin_gothic_heavy_font.pcx" />
   </ItemGroup>
 </Project>

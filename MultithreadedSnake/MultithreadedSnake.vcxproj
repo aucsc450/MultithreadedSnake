@@ -133,16 +133,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="fruit.c" />
-    <ClCompile Include="game.c" />
-    <ClCompile Include="multithreadedsnake.c" />
-    <ClCompile Include="snake.c" />
+    <ClCompile Include="board.cpp" />
+    <ClCompile Include="cell.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="multithreadedsnake.cpp" />
+    <ClCompile Include="node.cpp" />
+    <ClCompile Include="queue.cpp" />
+    <ClCompile Include="snake.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="fruit.h" />
+    <ClInclude Include="board.h" />
+    <ClInclude Include="cell.h" />
+    <ClInclude Include="direction.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="multithreadedsnake.h" />
+    <ClInclude Include="node.h" />
+    <ClInclude Include="queue.h" />
     <ClInclude Include="snake.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="graphics\franklin_gothic_heavy_font.pcx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
