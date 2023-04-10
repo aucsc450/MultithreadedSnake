@@ -256,6 +256,7 @@ bool Game_State::play_game() {
 
 	// Setting up threads
 	pthread_t apple_thread = create_pthread(spawn_apple, NULL);
+	pthread_join(apple_thread, NULL);
 
 	while (!game_over) {
 		while (speed_counter > 0) {
@@ -269,7 +270,7 @@ bool Game_State::play_game() {
 		// Game is over if the user has pressed the ESC key
 		if (key[KEY_ESC]) {
 			game_over = true;
-			join_pthread(apple_thread, NULL);
+			// join_pthread(apple_thread, NULL);
 			pressed_esc = true;
 		}
 		// Determining how long the player has played for currently
@@ -465,5 +466,6 @@ void* Game_State::spawn_apple(void* args) {
 			game_board->generate_apple();
 		}
 	} // while
+	pthread_exit(NULL);
 	return NULL;
 } // spawn_apple
