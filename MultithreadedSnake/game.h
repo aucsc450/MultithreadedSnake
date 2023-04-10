@@ -2,7 +2,7 @@
 * File: game.h
 *
 * Author: Anjola Aina
-* Last Modified: Sunday, April 9th, 2023
+* Last Modified: Monday, April 10th, 2023
 *
 * This file defines the game_state class, which contains the objects and functions controlling the execution of the game.
 */
@@ -61,6 +61,7 @@ typedef struct spawn_apple_params {
 // The game_state class
 class Game_State {
 private:
+	static pthread_t apple_thread;
 	BITMAP* buffer;
 	FONT* game_font;
 	static Board* game_board;
@@ -80,18 +81,17 @@ public:
 	void start_game();
 	void new_game();
 	void reset_game();
-	bool run_game();
+	void run_game();
 	bool main_menu();
 	Cell* get_next_cell(Cell* curr_position);
 	void handle_keyboard_input();
 	bool is_snake_out_of_bounds(int row, int col);
 	void run_game_logic();
 	bool play_game();
-	void draw_game_objects();
 	void draw_game_board();
 	void draw_snake();
 	void draw_apple();
-	bool end_game_menu();
+	void end_game_menu();
 	void update_screen();
 	static void increment_speed_counter();
 	static pthread_t create_pthread(void* (*thread_function) (void*), void* param);

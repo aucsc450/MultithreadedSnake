@@ -32,6 +32,7 @@ int main(void) {
 
 	Game_State* game_state_t = new Game_State();
 	game_state_t->start_game();
+	
 	//textout_right_ex(screen, font, "Made by Anjola Aina", WIDTH - 20, HEIGHT - 15, WHITE, -1);
 	//while (!key[KEY_ESC]); // wait until the ESC key is pressed to do anything (busy waiting loop)
 	allegro_exit();

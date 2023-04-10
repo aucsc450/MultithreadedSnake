@@ -2,7 +2,7 @@
 * File: game.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Sunday, April 9th, 2023
+* Last Modified: Monday, April 10th, 2023
 *
 * This file implements the game_state class.
 */
@@ -12,6 +12,7 @@
 volatile int Game_State::speed_counter = 0;
 bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
+pthread_t Game_State::apple_thread;
 
 /*
 Constructs a new instance of the game class, and initializes all variables.
@@ -22,7 +23,6 @@ Game_State::Game_State() {
 	game_board->generate_apple();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	//game_over = false;
 	dir = NONE;
 	speed_counter = 0;
 	timer = 0;
@@ -80,21 +80,17 @@ void Game_State::start_game() {
 } // start_game
 
 /*
-Creates a new game by setting all game values to their default state and runs the game.
-This function calls itself recursively every time the player wants to replay the game.
+Creates a new game.
 */
 void Game_State::new_game() {
-	bool play_again = run_game();
-	if (play_again) {
-		reset_game();
-		new_game();
-	}
+	run_game();
 } // new_game
 
 /*
 Resets the game, by setting all game objects back to their initial states.
 */
 void Game_State::reset_game() {
+	game_board->reset();
 	game_over = false;
 	speed_counter = 0;
 	timer = 0;
@@ -103,32 +99,27 @@ void Game_State::reset_game() {
 	minutes_elasped = 0;
 	player->reset();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	game_board->generate_apple();
+	//game_board->generate_apple();
 } // reset_game
 
 /*
 Runs the whole game, from the main menu to the end game menu.
-@return - true if the player wants to play the game again, false otherwise
 */
-bool Game_State::run_game() {
+void Game_State::run_game() {
 	bool advance = main_menu();
 	if (!advance) {
-		return false; // game is over
+		return; // the esc button was pressed, so terminate game
 	}
 	int installed_interrupt = install_int_ex(increment_speed_counter, BPS_TO_TIMER(FPS));
 	if (installed_interrupt != 0) {
 		allegro_message("Error setting up the interrupt handler.");
-		return false; // an error has occured, so do not restart the game again
+		return; // an error has occured, so terminate game
 	}
-	bool game_ended = play_game();
-	if (game_ended) {
-		return false; // game is over
-	}
-	bool pressed_esc = end_game_menu();
+	bool pressed_esc = play_game();
 	if (pressed_esc) {
-		return false; // game is over
+		return;
 	}
-	return true; // the player wants to play the game again
+	end_game_menu();
 } // run_game
 
 /*
@@ -211,7 +202,7 @@ Determines whether the snake is out of bounds, by checking if the current row an
 @return true if the snake is out of bounds, false otherwise
 */
 bool Game_State::is_snake_out_of_bounds(int row, int col) {
-	if (row < 0 || row > BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+	if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
 		return true;
 	}
 	return false;
@@ -246,18 +237,13 @@ void Game_State::run_game_logic() {
 } // run_game_logic
 
 /*
-Runs the actual game.
-@return - true if the game was over by pressing the ESC key, false otherwise
+Runs the game.
+@return - true if the user pressed the esc button, false otherwise
 */
 bool Game_State::play_game() {
 	bool pressed_esc = false;
-	bool skip_timer = true;
-	int test = 0;
-
 	// Setting up threads
-	pthread_t apple_thread = create_pthread(spawn_apple, NULL);
-	pthread_join(apple_thread, NULL);
-
+	apple_thread = create_pthread(spawn_apple, NULL);
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
@@ -270,7 +256,6 @@ bool Game_State::play_game() {
 		// Game is over if the user has pressed the ESC key
 		if (key[KEY_ESC]) {
 			game_over = true;
-			// join_pthread(apple_thread, NULL);
 			pressed_esc = true;
 		}
 		// Determining how long the player has played for currently
@@ -280,24 +265,14 @@ bool Game_State::play_game() {
 		draw_game_board();
 		draw_snake();
 		draw_apple();
-		textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "TEST: %d", test);
 		update_screen();
-		// draw_game_objects();
 	} // game loop
-
 	remove_int(increment_speed_counter); // removing the interrupt handler as we don't need it anymore
 	return pressed_esc;
 } // play_game
 
 /*
-Draws all the game objects to the buffer, and updates the screen at the end.
-*/
-void Game_State::draw_game_objects() {
-	
-} // draw_game_objects
-
-/*
-Draws all the game objects to the buffer, and updates the screen at the end.
+Draws the game board to the buffer.
 */
 void Game_State::draw_game_board() {
 	int start_x = INIT_X_START_POS;
@@ -318,10 +293,6 @@ void Game_State::draw_game_board() {
 				rectfill(buffer, start_x, start_y, end_x, end_y, DARK_LEMON_LIME);
 				swap_colour = false;
 			}
-			// For testing purposes - delete later
-			// textprintf_centre_ex(buffer, font, start_x + 25, start_y, WHITE, -1, "(%d, %d)", game_board->get_specific_cell(i, j)->get_row(), game_board->get_specific_cell(i, j)->get_col());
-
-
 			start_x += TILE_SIZE;
 			end_x += TILE_SIZE;
 		} // inner for
@@ -336,7 +307,7 @@ void Game_State::draw_game_board() {
 			swap_colour = true;
 		}
 	} // outer for
-	textout_right_ex(buffer, font, "Made by Anjola Aina", WIDTH - 20, HEIGHT - 15, WHITE, -1);
+	textout_right_ex(buffer, font, "Made for AUCSC 450 Winter 2023", WIDTH - 20, HEIGHT - 15, WHITE, -1);
 	textprintf_ex(buffer, game_font, 25, 25, WHITE, -1, "Score: %d", total_score);
 	textout_right_ex(buffer, game_font, "Stop - ESC", WIDTH - 25, 25, WHITE, -1);
 	if (seconds_elasped < 10) {
@@ -352,17 +323,14 @@ Draws the snake to the double buffer.
 */
 void Game_State::draw_snake() {
 	Node* temp = player->get_snake()->get_front();
-	// textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "Direction of snake: %d", dir);
 	while (temp != NULL) {
 		int row = temp->get_data()->get_row();
 		int col = temp->get_data()->get_col();
 		int x_pos = (col * TILE_SIZE) + X_OFFSET;
 		int y_pos = (row * TILE_SIZE) + Y_OFFSET;
 		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
-		textprintf_ex(buffer, font, 20, HEIGHT - 20, WHITE, -1, "Row %d, Col: %d", row, col);
-		textprintf_ex(buffer, font, 20, HEIGHT - 40, WHITE, -1, "X Pos %d, Y Pos: %d", x_pos, y_pos);
 		temp = temp->get_next();
-	}
+	} // while
 } // draw_snake
 
 /**
@@ -375,10 +343,9 @@ void Game_State::draw_apple() {
 				int x_pos = (j * TILE_SIZE) + X_OFFSET;
 				int y_pos = (i * TILE_SIZE) + Y_OFFSET;
 				rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, APPLE_RED);
-			}
-		}
-	}
-	
+			} // if
+		} // inner for
+	} // outer for
 } // draw_apple
 
 /*
@@ -386,20 +353,16 @@ Displays the end game menu.
 @param background - the static background
 @return - true if the escape key was pressed, false if the enter key was pressed
 */
-bool Game_State::end_game_menu() {
+void Game_State::end_game_menu() {
 	clear_bitmap(buffer);
 	draw_game_board();
 	textout_centre_ex(buffer, game_font, "Uh oh, the Game has ended!", WIDTH / 2, HEIGHT / 2 - 25, WHITE, -1);
-	textout_centre_ex(buffer, game_font, "Press ENTER to play again or ESC to exit the game!", WIDTH / 2, HEIGHT / 2, WHITE, -1);
+	textout_centre_ex(buffer, game_font, "Press ESC to exit the game!", WIDTH / 2, HEIGHT / 2, WHITE, -1);
 	update_screen();
 	while (true) {
 		clear_keybuf();
 		if (key[KEY_ESC]) {
-			return true;
-		}
-		if (key[KEY_ENTER]) {
-			key[KEY_ENTER] = 0; // so that the user can press the key again
-			return false; // the enter key was pressed
+			break;
 		}
 	} // while
 } // end_game_menu
@@ -466,6 +429,6 @@ void* Game_State::spawn_apple(void* args) {
 			game_board->generate_apple();
 		}
 	} // while
-	pthread_exit(NULL);
+	pthread_join(apple_thread, NULL);
 	return NULL;
 } // spawn_apple

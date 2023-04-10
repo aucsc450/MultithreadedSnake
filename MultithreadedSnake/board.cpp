@@ -61,3 +61,14 @@ void Board::generate_apple() {
 	} // while
 	cells[rand_row][rand_col]->set_type(APPLE);
 } // generate_food
+
+/**
+Resets the board by making every cell empty.
+*/
+void Board::reset() {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			set_type_for_specific_cell(i, j, EMPTY);
+		}
+	}
+} // reset
