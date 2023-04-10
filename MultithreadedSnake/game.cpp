@@ -8,7 +8,10 @@
 */
 #include "game.h"
 
+// Variables to be shared among all the threads
 volatile int Game_State::speed_counter = 0;
+bool Game_State::game_over = false;
+Board* Game_State::game_board = new Board();
 
 /*
 Constructs a new instance of the game class, and initializes all variables.
@@ -16,11 +19,10 @@ Constructs a new instance of the game class, and initializes all variables.
 Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
-	game_board = new Board();
 	game_board->generate_apple();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	game_over = false;
+	//game_over = false;
 	dir = NONE;
 	speed_counter = 0;
 	timer = 0;
@@ -215,21 +217,6 @@ bool Game_State::is_snake_out_of_bounds(int row, int col) {
 	return false;
 } // is_snake_out_of_bounds
 
-/**
-Determines whether the apple is currently spawned in the board.
-@return - true if the apple is in the board, false otherwise
-*/
-bool Game_State::is_apple_in_board() {
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			if (game_board->get_specific_cell(i, j)->get_type() == APPLE) {
-				return true;
-			} // if
-		} // inner for
-	} // outer for
-	return false; // the apple is currently in the board
-} // is_apple_in_board
-
 /*
 Runs the following methods associated with the game logic, such as moving the player, fish, and trash sprites,
 getting input from the user, and ensuring that all sprites are not out of bounds.
@@ -268,6 +255,7 @@ bool Game_State::play_game() {
 	int test = 0;
 
 	// Setting up threads
+	pthread_t apple_thread = create_pthread(spawn_apple, NULL);
 
 	while (!game_over) {
 		while (speed_counter > 0) {
@@ -278,17 +266,14 @@ bool Game_State::play_game() {
 			}
 			
 		} // inner while
-
 		// Game is over if the user has pressed the ESC key
 		if (key[KEY_ESC]) {
 			game_over = true;
 			pressed_esc = true;
 		}
-
 		// Determining how long the player has played for currently
 		seconds_elasped = (timer / FPS) % FPS;
 		minutes_elasped = (timer / FPS) / FPS;
-		
 		// Updating the screen
 		draw_game_board();
 		draw_snake();
@@ -296,9 +281,9 @@ bool Game_State::play_game() {
 		textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "TEST: %d", test);
 		update_screen();
 		// draw_game_objects();
-		
-
 	} // game loop
+
+	join_pthread(apple_thread, NULL);
 	remove_int(increment_speed_counter); // removing the interrupt handler as we don't need it anymore
 	return pressed_esc;
 } // play_game
@@ -457,3 +442,28 @@ Terminates a thread (by joining it with the parent thread).
 void Game_State::join_pthread(pthread_t thread_id, void** return_val) {
 	pthread_join(thread_id, return_val);
 } // join_pthread
+
+/**
+Determines whether the apple is currently spawned in the board.
+@return - true if the apple is in the board, false otherwise
+*/
+bool Game_State::is_apple_in_board() {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (game_board->get_specific_cell(i, j)->get_type() == APPLE) {
+				return true;
+			} // if
+		} // inner for
+	} // outer for
+	return false; // an apple is currently NOT in the board
+} // is_apple_in_board
+
+void* Game_State::spawn_apple(void* args) {
+	// spawn_apple_params* thread_params = (spawn_apple_params*) args;
+	while (!game_over) {
+		if (!is_apple_in_board()) {
+			game_board->generate_apple();
+		}
+	} // while
+	return NULL;
+} // spawn_apple

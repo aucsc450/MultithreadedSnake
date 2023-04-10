@@ -52,14 +52,20 @@
 #define Y_OFFSET 77
 #define SNAKE_BLOCK_SIZE 45
 
+// thread parameter struct
+typedef struct spawn_apple_params {
+	int row;
+	int col;
+} spawn_apple_params;
+
 // The game_state class
 class Game_State {
 private:
 	BITMAP* buffer;
 	FONT* game_font;
-	Board* game_board;
+	static Board* game_board;
 	Snake* player;
-	bool game_over;
+	static bool game_over;
 	direction dir;
 	static volatile int speed_counter;
 	volatile int timer;
@@ -79,7 +85,6 @@ public:
 	Cell* get_next_cell(Cell* curr_position);
 	void handle_keyboard_input();
 	bool is_snake_out_of_bounds(int row, int col);
-	bool is_apple_in_board();
 	void run_game_logic();
 	bool play_game();
 	void draw_game_objects();
@@ -91,7 +96,8 @@ public:
 	static void increment_speed_counter();
 	static pthread_t create_pthread(void* (*thread_function) (void*), void* param);
 	static void join_pthread(pthread_t thread_id, void** return_val);
-	static void* spawn_apple();
+	static bool is_apple_in_board();
+	static void* spawn_apple(void* args);
 };
 
 #endif

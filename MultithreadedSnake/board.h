@@ -23,7 +23,7 @@ public:
     ~Board();
     Cell* get_specific_cell(int row, int col);
     void set_type_for_specific_cell(int row, int col, cell_type type_p);
-    void generate_food();
+    void generate_apple();
 };
 
 #endif
