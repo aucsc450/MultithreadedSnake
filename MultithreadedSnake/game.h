@@ -79,6 +79,7 @@ public:
 	Cell* get_next_cell(Cell* curr_position);
 	void handle_keyboard_input();
 	bool is_snake_out_of_bounds(int row, int col);
+	bool is_apple_in_board();
 	void run_game_logic();
 	bool play_game();
 	void draw_game_objects();
@@ -90,6 +91,7 @@ public:
 	static void increment_speed_counter();
 	static pthread_t create_pthread(void* (*thread_function) (void*), void* param);
 	static void join_pthread(pthread_t thread_id, void** return_val);
+	static void* spawn_apple();
 };
 
 #endif

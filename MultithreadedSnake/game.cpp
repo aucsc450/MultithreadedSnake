@@ -202,12 +202,33 @@ void Game_State::handle_keyboard_input() {
 	}
 } // handle_keyboard_input
 
+/**
+Determines whether the snake is out of bounds, by checking if the current row and col are either 0 or larger than the board size.
+@param row - the x-coordinate of the snake's head
+@param col - the y-coordinate of the snake's head
+@return true if the snake is out of bounds, false otherwise
+*/
 bool Game_State::is_snake_out_of_bounds(int row, int col) {
 	if (row < 0 || row > BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
 		return true;
 	}
 	return false;
 } // is_snake_out_of_bounds
+
+/**
+Determines whether the apple is currently spawned in the board.
+@return - true if the apple is in the board, false otherwise
+*/
+bool Game_State::is_apple_in_board() {
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (game_board->get_specific_cell(i, j)->get_type() == APPLE) {
+				return true;
+			} // if
+		} // inner for
+	} // outer for
+	return false; // the apple is currently in the board
+} // is_apple_in_board
 
 /*
 Runs the following methods associated with the game logic, such as moving the player, fish, and trash sprites,
@@ -245,6 +266,9 @@ bool Game_State::play_game() {
 	bool pressed_esc = false;
 	bool skip_timer = true;
 	int test = 0;
+
+	// Setting up threads
+
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
@@ -337,6 +361,9 @@ void Game_State::draw_game_board() {
 	}
 } // draw_game_board
 
+/**
+Draws the snake to the double buffer.
+*/
 void Game_State::draw_snake() {
 	Node* temp = player->get_snake()->get_front();
 	// textprintf_right_ex(buffer, font, WIDTH - 20, HEIGHT - 40, WHITE, -1, "Direction of snake: %d", dir);
@@ -352,6 +379,9 @@ void Game_State::draw_snake() {
 	}
 } // draw_snake
 
+/**
+Draws the apple to the double buffer.
+*/
 void Game_State::draw_apple() {
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
@@ -363,7 +393,7 @@ void Game_State::draw_apple() {
 		}
 	}
 	
-}
+} // draw_apple
 
 /*
 Displays the end game menu.
@@ -407,12 +437,23 @@ void Game_State::increment_speed_counter() {
 } // increment_speed_counter
 END_OF_FUNCTION(increment_speed_counter);
 
+/**
+Creates a new thread with the thread function and thread parameters specified in the parameters of this function, and returns the thread id.
+@param thread_function - the function to be run by the new thread
+@param param - the parameter(s) for the thread function
+@return - the thread id of the newly created thread.
+*/
 pthread_t Game_State::create_pthread(void* (*thread_function) (void*), void* param) {
 	pthread_t thread_id;
 	pthread_create(&thread_id, NULL, thread_function, param);
 	return thread_id;
 } // create_pthread
 
+/**
+Terminates a thread (by joining it with the parent thread).
+@param thread_id - the id of the thread to be terminated
+@param return_val - the return value of the thread (or NULL if the thread doesn't return anything)
+*/
 void Game_State::join_pthread(pthread_t thread_id, void** return_val) {
 	pthread_join(thread_id, return_val);
 } // join_pthread
