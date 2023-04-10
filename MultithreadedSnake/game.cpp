@@ -399,15 +399,6 @@ pthread_t Game_State::create_pthread(void* (*thread_function) (void*), void* par
 } // create_pthread
 
 /**
-Terminates a thread (by joining it with the parent thread).
-@param thread_id - the id of the thread to be terminated
-@param return_val - the return value of the thread (or NULL if the thread doesn't return anything)
-*/
-void Game_State::join_pthread(pthread_t thread_id, void** return_val) {
-	pthread_join(thread_id, return_val);
-} // join_pthread
-
-/**
 Determines whether the apple is currently spawned in the board.
 @return - true if the apple is in the board, false otherwise
 */
