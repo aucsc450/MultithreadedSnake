@@ -2,11 +2,11 @@
 * File: queue.h
 *
 * Author: Anjola Aina
-* Last Modified: Tuesday, April 4th, 2023
-*
-* This file contains the structs and methods associated with initializing a queue,
-* adding an element to the queue, and removing an element from the queue. The following website
-* was used as a reference to create the queue abstract data type: https://www.codesdope.com/blog/article/making-a-queue-using-linked-list-in-c/
+* Last Modified: Tuesday, April 9th, 2023
+* 
+* This file defines the Queue class to be implemented in its respective .h file.
+* 
+* The following website was used as a reference to create the queue abstract data type: https://www.codesdope.com/blog/article/making-a-queue-using-linked-list-in-c/
 */
 #ifndef queue_h
 #define queue_h
