@@ -2,19 +2,15 @@
 * File: node.h
 *
 * Author: Anjola Aina
-* Last Modified: Thursday, April 6th, 2023
+* Last Modified: Sunday, April 9th, 2023
 *
-* This file contains the cell struct, which represents a point in the game board.
-* There contains two methods, one to create a cell and another to free a cell.
-* There also exists an enum called cell_type, which determines what "object" is occupying the cell.
-* To map the enum to its equivalent string, the following source was used to help achieve this: https://www.linkedin.com/pulse/mapping-enum-string-c-language-sathishkumar-duraisamy/
+* This file defines the Node class, which is implemented in its respective .cpp file.
 */
 #ifndef node_h
 #define node_h
 #include <stdlib.h>
 #include <stdio.h>
 #include "cell.h"
-
 
 class Node {
 private:
