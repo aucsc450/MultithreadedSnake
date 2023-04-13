@@ -438,7 +438,9 @@ void Game_State::draw_apple() {
 			if (game_board->get_specific_cell(i, j)->get_type() == APPLE) {
 				int x_pos = (j * TILE_SIZE) + X_OFFSET;
 				int y_pos = (i * TILE_SIZE) + Y_OFFSET;
-				rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, APPLE_RED);
+				circlefill(buffer, x_pos + 16, y_pos + 25, 17, APPLE_RED);
+				circlefill(buffer, x_pos + 29, y_pos + 25, 17, APPLE_RED);
+				rectfill(buffer, x_pos + 21, y_pos, x_pos + 24, y_pos + 12, FOREST_BROWN);
 			} // if
 		} // inner for
 	} // outer for
