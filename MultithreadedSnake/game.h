@@ -89,7 +89,6 @@ public:
 	void run_game();
 	bool main_menu();
 	Cell* get_next_cell(Cell* curr_position);
-	void handle_keyboard_input();
 	bool is_snake_out_of_bounds(int row, int col);
 	void run_game_logic();
 	bool play_game();
@@ -107,6 +106,8 @@ public:
 	static pthread_t create_pthread(void* (*thread_function) (void*), void* param);
 	static bool is_apple_in_board();
 	static void* spawn_apple(void* args);
+	static void* handle_keyboard_input(void* args);
+
 };
 
 #endif

@@ -194,28 +194,6 @@ Cell* Game_State::get_next_cell(Cell* curr_position) {
 } // get_next_cell
 
 /**
-Handles keyboard input by changing the direction of the snake based on what key the user presses.
-*/
-void Game_State::handle_keyboard_input() {
-	clear_keybuf();
-	if (key[KEY_LEFT]) {
-		dir = LEFT;
-	}
-	else if (key[KEY_RIGHT]) {
-		dir = RIGHT;
-	}
-	else if (key[KEY_UP]) {
-		dir = UP;
-	}
-	else if (key[KEY_DOWN]) {
-		dir = DOWN;
-	}
-	else {
-		// dir = NONE;
-	}
-} // handle_keyboard_input
-
-/**
 Determines whether the snake is out of bounds, by checking if the current row and col are either 0 or larger than the board size.
 @param row - the x-coordinate of the snake's head
 @param col - the y-coordinate of the snake's head
@@ -265,6 +243,7 @@ bool Game_State::play_game() {
 	bool pressed_esc = false;
 	// Setting up threads
 	apple_thread = create_pthread(spawn_apple, NULL);
+	input_thread = create_pthread(handle_keyboard_input, NULL);
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
@@ -272,7 +251,7 @@ bool Game_State::play_game() {
 			if (timer % SLOW_MOVEMENT_DOWN == 0) { // this slows down the game logic so that it executes less frequently
 				run_game_logic();
 			}
-			handle_keyboard_input();
+			// handle_keyboard_input();
 		} // inner while
 		// Game is over if the user has pressed the ESC key
 		if (key[KEY_ESC]) {
@@ -461,7 +440,6 @@ void Game_State::draw_face_down(int x_pos, int y_pos) {
 	rectfill(buffer, x_pos + 33, y_pos + 37, x_pos + 35, y_pos + 39, GREY);
 } // draw_face_down
 
-
 /**
 Draws the apple to the double buffer.
 */
@@ -559,3 +537,28 @@ void* Game_State::spawn_apple(void* args) {
 	pthread_join(apple_thread, NULL);
 	return NULL;
 } // spawn_apple
+
+/**
+Handles keyboard input by changing the direction of the snake based on what key the user presses.
+*/
+void* Game_State::handle_keyboard_input(void* args) {
+	while (!game_over) {
+		while (speed_counter > 0) {
+			clear_keybuf();
+			if (key[KEY_LEFT]) {
+				dir = LEFT;
+			}
+			else if (key[KEY_RIGHT]) {
+				dir = RIGHT;
+			}
+			else if (key[KEY_UP]) {
+				dir = UP;
+			}
+			else if (key[KEY_DOWN]) {
+				dir = DOWN;
+			}
+		} // inner while
+	} // game loop
+	pthread_join(input_thread, NULL);
+	return NULL;
+} // handle_keyboard_input
