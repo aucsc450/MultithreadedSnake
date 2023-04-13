@@ -2,7 +2,7 @@
 * File: game.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Monday, April 10th, 2023
+* Last Modified: Thursday, April 13th, 2023
 *
 * This file implements the game_state class.
 */
@@ -16,6 +16,7 @@ bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
 pthread_t Game_State::apple_thread;
 pthread_t Game_State::input_thread;
+pthread_t Game_State::end_game_thread;
 direction Game_State::dir = NONE;
 
 /*
@@ -235,10 +236,12 @@ Runs the game.
 @return - true if the user pressed the esc button, false otherwise
 */
 bool Game_State::play_game() {
-	bool pressed_esc = false;
+	void* pressed_esc;
 	// Setting up threads
-	apple_thread = create_pthread(spawn_apple, NULL);
-	input_thread = create_pthread(handle_keyboard_input, NULL);
+	apple_thread = create_pthread(spawn_apple, NULL); // spawning apple
+	input_thread = create_pthread(handle_keyboard_input, NULL); // handling input from keyboard
+	end_game_thread = create_pthread(end_game, NULL); // did the user press the ESC key?
+	// Game loop
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
@@ -246,21 +249,16 @@ bool Game_State::play_game() {
 			if (timer % SLOW_MOVEMENT_DOWN == 0) { // this slows down the game logic so that it executes less frequently
 				run_game_logic();
 			}
-			// handle_keyboard_input();
 		} // inner while
-		// Game is over if the user has pressed the ESC key
-		if (key[KEY_ESC]) {
-			game_over = true;
-			pressed_esc = true;
-		}
 		// Updating the screen
 		draw_game_board();
-		draw_snake();
 		draw_apple();
+		draw_snake();
 		update_screen();
 	} // game loop
+	pthread_join(end_game_thread, &pressed_esc);
 	remove_int(increment_speed_counter); // removing the interrupt handler as we don't need it anymore
-	return pressed_esc;
+	return (bool)pressed_esc;
 } // play_game
 
 /*
@@ -532,6 +530,7 @@ void* Game_State::spawn_apple(void* args) {
 
 /**
 Handles keyboard input by changing the direction of the snake based on what key the user presses.
+@param args - thread parameters (none)
 */
 void* Game_State::handle_keyboard_input(void* args) {
 	while (!game_over) {
@@ -554,3 +553,18 @@ void* Game_State::handle_keyboard_input(void* args) {
 	pthread_join(input_thread, NULL);
 	return NULL;
 } // handle_keyboard_input
+
+/**
+Checks whether or not the player has pressed the ESC key to stop the game.
+@param args - thread parameters (none)
+@return - true if the player pressed the ESC button, false otherwise
+*/
+void* Game_State::end_game(void* args) {
+	while (!game_over) {
+		if (key[KEY_ESC]) {
+			game_over = true;
+			return (void*) true;
+		}
+	} // while
+	return (void*) false; 
+} // end_game

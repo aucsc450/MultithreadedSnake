@@ -2,7 +2,7 @@
 * File: game.h
 *
 * Author: Anjola Aina
-* Last Modified: Monday, April 10th, 2023
+* Last Modified: Thursday, April 13th, 2023
 *
 * This file defines the game_state class, which contains the objects and functions controlling the execution of the game.
 */
@@ -52,17 +52,12 @@
 #define Y_OFFSET 77
 #define SNAKE_BLOCK_SIZE 45
 
-// thread parameter struct
-typedef struct spawn_apple_params {
-	int row;
-	int col;
-} spawn_apple_params;
-
 // The game_state class
 class Game_State {
 private:
 	static pthread_t apple_thread;
 	static pthread_t input_thread;
+	static pthread_t end_game_thread;
 	BITMAP* buffer;
 	FONT* game_font;
 	SAMPLE* background_music;
@@ -105,7 +100,7 @@ public:
 	static bool is_apple_in_board();
 	static void* spawn_apple(void* args);
 	static void* handle_keyboard_input(void* args);
-
+	static void* end_game(void* args);
 };
 
 #endif
