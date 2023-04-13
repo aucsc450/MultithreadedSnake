@@ -35,7 +35,7 @@
 #define VOLUME 32
 #define PANNING 32
 #define FREQUENCY 1000
-#define SLOW_MOVEMENT_DOWN 10
+#define SLOW_MOVEMENT_DOWN 7
 #define MAX_SCORE_LEN 12 // max int digits = 10 + 1 to account for the '\0' (null) character and + 1 for the '-' character
 #define MAX_TIME_LEN 3
 
@@ -69,7 +69,7 @@ private:
 	static bool game_over;
 	direction dir;
 	static volatile int speed_counter;
-	volatile int timer;
+	static volatile int timer;
 	int total_score;
 	int seconds_elasped;
 	int minutes_elasped;
@@ -90,6 +90,11 @@ public:
 	bool play_game();
 	void draw_game_board();
 	void draw_snake();
+	void draw_snake_face(int x_pos, int y_pos);
+	void draw_face_left(int x_pos, int y_pos);
+	void draw_face_right(int x_pos, int y_pos);
+	void draw_face_up(int x_pos, int y_pos);
+	void draw_face_down(int x_pos, int y_pos);
 	void draw_apple();
 	void end_game_menu();
 	void update_screen();

@@ -10,6 +10,7 @@
 
 // Variables to be shared among all the threads
 volatile int Game_State::speed_counter = 0;
+volatile int Game_State::timer = 0;
 bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
 pthread_t Game_State::apple_thread;
@@ -24,8 +25,6 @@ Game_State::Game_State() {
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	dir = NONE;
-	speed_counter = 0;
-	timer = 0;
 	total_score = 0;
 	seconds_elasped = 0;
 	minutes_elasped = 0;
@@ -191,7 +190,7 @@ void Game_State::handle_keyboard_input() {
 		dir = DOWN;
 	}
 	else {
-		dir = NONE;
+		// dir = NONE;
 	}
 } // handle_keyboard_input
 
@@ -213,7 +212,7 @@ Runs the following methods associated with the game logic, such as moving the pl
 getting input from the user, and ensuring that all sprites are not out of bounds.
 */
 void Game_State::run_game_logic() {
-	handle_keyboard_input();
+	// handle_keyboard_input();
 	if (dir != NONE) {
 		Cell* curr_position = player->get_snake()->get_front()->get_data();
 		Cell* next_cell = get_next_cell(curr_position);
@@ -232,7 +231,7 @@ void Game_State::run_game_logic() {
 			next_cell->set_type(EMPTY);
 			total_score += 100;
 		}
-		dir = NONE;
+		//dir = NONE;
 	}
 } // run_game_logic
 
@@ -251,7 +250,7 @@ bool Game_State::play_game() {
 			if (timer % SLOW_MOVEMENT_DOWN == 0) { // this slows down the game logic so that it executes less frequently
 				run_game_logic();
 			}
-			
+			handle_keyboard_input();
 		} // inner while
 		// Game is over if the user has pressed the ESC key
 		if (key[KEY_ESC]) {
@@ -329,9 +328,106 @@ void Game_State::draw_snake() {
 		int x_pos = (col * TILE_SIZE) + X_OFFSET;
 		int y_pos = (row * TILE_SIZE) + Y_OFFSET;
 		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+		if (player->get_snake()->is_front(temp)) {
+
+			// all values for front direction
+			draw_snake_face(x_pos, y_pos);
+			//// eyes
+			//rectfill(buffer, x_pos + 20, y_pos + 5, x_pos + 30, y_pos + 15, WHITE); 
+			//rectfill(buffer, x_pos + 20, y_pos + 30, x_pos + 30, y_pos + 40, WHITE);
+			//// pupils
+			//rectfill(buffer, x_pos + 25, y_pos + 7, x_pos + 30, y_pos + 13, BLACK);
+			//rectfill(buffer, x_pos + 25, y_pos + 32, x_pos + 30, y_pos + 38, BLACK);
+			//// white eye part
+			//rectfill(buffer, x_pos + 27, y_pos + 8, x_pos + 28, y_pos + 9, WHITE);
+			//rectfill(buffer, x_pos + 27, y_pos + 33, x_pos + 28, y_pos + 34, WHITE);
+			//// nostrils
+			//rectfill(buffer, x_pos + 38, y_pos + 10, x_pos + 40, y_pos + 12, GREY);
+			//rectfill(buffer, x_pos + 38, y_pos + 32, x_pos + 40, y_pos + 34, GREY);
+		}
 		temp = temp->get_next();
 	} // while
 } // draw_snake
+
+void Game_State::draw_snake_face(int x_pos, int y_pos) {
+	switch (dir) {
+		case LEFT:
+			draw_face_left(x_pos, y_pos);
+			break;
+		case RIGHT:
+			draw_face_right(x_pos, y_pos);
+			break;
+		case UP:
+			draw_face_up(x_pos, y_pos);
+			break;
+		case DOWN:
+			draw_face_down(x_pos, y_pos);
+			break;
+		case NONE:
+			draw_face_up(x_pos, y_pos);
+	}
+} // draw_snake_front
+
+void Game_State::draw_face_left(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 20, y_pos + 5, x_pos + 30, y_pos + 15, WHITE);
+	rectfill(buffer, x_pos + 20, y_pos + 30, x_pos + 30, y_pos + 40, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 25, y_pos + 7, x_pos + 30, y_pos + 13, BLACK);
+	rectfill(buffer, x_pos + 25, y_pos + 32, x_pos + 30, y_pos + 38, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 27, y_pos + 8, x_pos + 28, y_pos + 9, WHITE);
+	rectfill(buffer, x_pos + 27, y_pos + 33, x_pos + 28, y_pos + 34, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 8, y_pos + 10, x_pos + 10, y_pos + 12, GREY);
+	rectfill(buffer, x_pos + 8, y_pos + 32, x_pos + 10, y_pos + 34, GREY);
+}
+
+void Game_State::draw_face_right(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 15, y_pos + 5, x_pos + 25, y_pos + 15, WHITE);
+	rectfill(buffer, x_pos + 15, y_pos + 30, x_pos + 25, y_pos + 40, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 15, y_pos + 7, x_pos + 20, y_pos + 13, BLACK);
+	rectfill(buffer, x_pos + 15, y_pos + 32, x_pos + 20, y_pos + 38, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 17, y_pos + 8, x_pos + 18, y_pos + 9, WHITE);
+	rectfill(buffer, x_pos + 17, y_pos + 33, x_pos + 18, y_pos + 34, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 35, y_pos + 10, x_pos + 37, y_pos + 12, GREY);
+	rectfill(buffer, x_pos + 35, y_pos + 32, x_pos + 37, y_pos + 34, GREY);
+}
+
+void Game_State::draw_face_up(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 5, y_pos + 15, x_pos + 15, y_pos + 25, WHITE);
+	rectfill(buffer, x_pos + 30, y_pos + 15, x_pos + 40, y_pos + 25, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 7, y_pos + 19, x_pos + 13, y_pos + 25, BLACK);
+	rectfill(buffer, x_pos + 32, y_pos + 19, x_pos + 38, y_pos + 25, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 8, y_pos + 20, x_pos + 9, y_pos + 21, WHITE);
+	rectfill(buffer, x_pos + 36, y_pos + 20, x_pos + 37, y_pos + 21, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 10, y_pos + 7, x_pos + 12, y_pos + 9, GREY);
+	rectfill(buffer, x_pos + 33, y_pos + 7, x_pos + 35, y_pos + 9, GREY);
+}
+
+void Game_State::draw_face_down(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 5, y_pos + 15, x_pos + 15, y_pos + 25, WHITE);
+	rectfill(buffer, x_pos + 30, y_pos + 15, x_pos + 40, y_pos + 25, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 7, y_pos + 15, x_pos + 13, y_pos + 21, BLACK);
+	rectfill(buffer, x_pos + 32, y_pos + 15, x_pos + 38, y_pos + 21, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 8, y_pos + 16, x_pos + 9, y_pos + 17, WHITE);
+	rectfill(buffer, x_pos + 36, y_pos + 16, x_pos + 37, y_pos + 17, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 10, y_pos + 37, x_pos + 12, y_pos + 39, GREY);
+	rectfill(buffer, x_pos + 33, y_pos + 37, x_pos + 35, y_pos + 39, GREY);
+}
+
 
 /**
 Draws the apple to the double buffer.
