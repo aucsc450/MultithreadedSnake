@@ -14,6 +14,7 @@ volatile int Game_State::timer = 0;
 bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
 pthread_t Game_State::apple_thread;
+pthread_t Game_State::input_thread;
 direction Game_State::dir = NONE;
 
 /*
@@ -350,26 +351,17 @@ void Game_State::draw_snake() {
 		int y_pos = (row * TILE_SIZE) + Y_OFFSET;
 		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
 		if (player->get_snake()->is_front(temp)) {
-
-			// all values for front direction
 			draw_snake_face(x_pos, y_pos);
-			//// eyes
-			//rectfill(buffer, x_pos + 20, y_pos + 5, x_pos + 30, y_pos + 15, WHITE); 
-			//rectfill(buffer, x_pos + 20, y_pos + 30, x_pos + 30, y_pos + 40, WHITE);
-			//// pupils
-			//rectfill(buffer, x_pos + 25, y_pos + 7, x_pos + 30, y_pos + 13, BLACK);
-			//rectfill(buffer, x_pos + 25, y_pos + 32, x_pos + 30, y_pos + 38, BLACK);
-			//// white eye part
-			//rectfill(buffer, x_pos + 27, y_pos + 8, x_pos + 28, y_pos + 9, WHITE);
-			//rectfill(buffer, x_pos + 27, y_pos + 33, x_pos + 28, y_pos + 34, WHITE);
-			//// nostrils
-			//rectfill(buffer, x_pos + 38, y_pos + 10, x_pos + 40, y_pos + 12, GREY);
-			//rectfill(buffer, x_pos + 38, y_pos + 32, x_pos + 40, y_pos + 34, GREY);
 		}
 		temp = temp->get_next();
 	} // while
 } // draw_snake
 
+/**
+Draws the snake's face, depending on what direction the snake is currently going.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
 void Game_State::draw_snake_face(int x_pos, int y_pos) {
 	switch (dir) {
 		case LEFT:
@@ -390,7 +382,9 @@ void Game_State::draw_snake_face(int x_pos, int y_pos) {
 } // draw_snake_front
 
 /**
-Draws the snake.
+Draws the face of the snake when the snake's direction is LEFT.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
 */
 void Game_State::draw_face_left(int x_pos, int y_pos) {
 	// eyes
@@ -407,6 +401,11 @@ void Game_State::draw_face_left(int x_pos, int y_pos) {
 	rectfill(buffer, x_pos + 8, y_pos + 32, x_pos + 10, y_pos + 34, GREY);
 } // draw_face_left
 
+/**
+Draws the face of the snake when the snake's direction is RIGHT.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
 void Game_State::draw_face_right(int x_pos, int y_pos) {
 	// eyes
 	rectfill(buffer, x_pos + 15, y_pos + 5, x_pos + 25, y_pos + 15, WHITE);
@@ -422,6 +421,11 @@ void Game_State::draw_face_right(int x_pos, int y_pos) {
 	rectfill(buffer, x_pos + 35, y_pos + 32, x_pos + 37, y_pos + 34, GREY);
 } // draw_face_right
 
+/**
+Draws the face of the snake when the snake's direction is UP.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
 void Game_State::draw_face_up(int x_pos, int y_pos) {
 	// eyes
 	rectfill(buffer, x_pos + 5, y_pos + 15, x_pos + 15, y_pos + 25, WHITE);
@@ -437,6 +441,11 @@ void Game_State::draw_face_up(int x_pos, int y_pos) {
 	rectfill(buffer, x_pos + 33, y_pos + 7, x_pos + 35, y_pos + 9, GREY);
 } // draw_face_up
 
+/**
+Draws the face of the snake when the snake's direction is DOWN.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
 void Game_State::draw_face_down(int x_pos, int y_pos) {
 	// eyes
 	rectfill(buffer, x_pos + 5, y_pos + 15, x_pos + 15, y_pos + 25, WHITE);
@@ -537,8 +546,11 @@ bool Game_State::is_apple_in_board() {
 	return false; // an apple is currently NOT in the board
 } // is_apple_in_board
 
+/**
+The thread method that spawns an apple if an apple is not already in the game board.
+@param args - thread parameters (none)
+*/
 void* Game_State::spawn_apple(void* args) {
-	// spawn_apple_params* thread_params = (spawn_apple_params*) args;
 	while (!game_over) {
 		if (!is_apple_in_board()) {
 			game_board->generate_apple();
