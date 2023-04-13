@@ -66,4 +66,15 @@
   <ItemGroup>
     <None Include="graphics\franklin_gothic_heavy_font.pcx" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="sounds\apple_crunch.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sounds\background_music.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sounds\end_game_sound.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
 </Project>

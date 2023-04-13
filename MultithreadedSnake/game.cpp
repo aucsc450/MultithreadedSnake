@@ -14,6 +14,7 @@ volatile int Game_State::timer = 0;
 bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
 pthread_t Game_State::apple_thread;
+direction Game_State::dir = NONE;
 
 /*
 Constructs a new instance of the game class, and initializes all variables.
@@ -21,10 +22,13 @@ Constructs a new instance of the game class, and initializes all variables.
 Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
+	background_music = NULL;
+	crunch_sound = NULL;
+	game_over_sound = NULL;
 	game_board->generate_apple();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	dir = NONE;
+	// dir = NONE;
 	total_score = 0;
 	seconds_elasped = 0;
 	minutes_elasped = 0;
@@ -53,12 +57,27 @@ bool Game_State::load_fonts() {
 } // load_fonts
 
 /*
+Loads all BMP files into the sounds used in the game.
+@return - true if all files was loaded successfully into their respective sounds, false otherwise
+*/
+bool Game_State::load_sounds() {
+	background_music = load_sample("sounds\\background_music.wav");
+	crunch_sound = load_sample("sounds\\apple_crunch.wav");
+	game_over_sound = load_sample("sounds\\end_game_sound.wav");
+	if (background_music != NULL && crunch_sound != NULL && game_over_sound != NULL) {
+		return true;
+	}
+	return false; // sounds are null
+} // load_sounds
+
+/*
 Initializes the game by loading all the game objects.
 @return - true if every game object was loaded successfully, false otherwise
 */
 bool Game_State::initialize_game() {
 	bool loaded_fonts = load_fonts();
-	if (!loaded_fonts) {
+	bool loaded_sounds = load_sounds();
+	if (!loaded_fonts || !loaded_sounds) {
 		return false;
 	}
 	return true;
@@ -75,6 +94,7 @@ void Game_State::start_game() {
 		allegro_message("Error loading game objects.");
 		return;
 	}
+	play_sample(background_music, VOLUME, PANNING, FREQUENCY, TRUE);
 	new_game();
 } // start_game
 
@@ -227,6 +247,7 @@ void Game_State::run_game_logic() {
 		}
 		player->move(next_cell);
 		if (next_cell->get_type() == APPLE) {
+			play_sample(crunch_sound, VOLUME * 2, PANNING, FREQUENCY, FALSE);
 			player->grow(curr_position);
 			next_cell->set_type(EMPTY);
 			total_score += 100;
@@ -368,6 +389,9 @@ void Game_State::draw_snake_face(int x_pos, int y_pos) {
 	}
 } // draw_snake_front
 
+/**
+Draws the snake.
+*/
 void Game_State::draw_face_left(int x_pos, int y_pos) {
 	// eyes
 	rectfill(buffer, x_pos + 20, y_pos + 5, x_pos + 30, y_pos + 15, WHITE);
@@ -381,7 +405,7 @@ void Game_State::draw_face_left(int x_pos, int y_pos) {
 	// nostrils
 	rectfill(buffer, x_pos + 8, y_pos + 10, x_pos + 10, y_pos + 12, GREY);
 	rectfill(buffer, x_pos + 8, y_pos + 32, x_pos + 10, y_pos + 34, GREY);
-}
+} // draw_face_left
 
 void Game_State::draw_face_right(int x_pos, int y_pos) {
 	// eyes
@@ -396,7 +420,7 @@ void Game_State::draw_face_right(int x_pos, int y_pos) {
 	// nostrils
 	rectfill(buffer, x_pos + 35, y_pos + 10, x_pos + 37, y_pos + 12, GREY);
 	rectfill(buffer, x_pos + 35, y_pos + 32, x_pos + 37, y_pos + 34, GREY);
-}
+} // draw_face_right
 
 void Game_State::draw_face_up(int x_pos, int y_pos) {
 	// eyes
@@ -411,7 +435,7 @@ void Game_State::draw_face_up(int x_pos, int y_pos) {
 	// nostrils
 	rectfill(buffer, x_pos + 10, y_pos + 7, x_pos + 12, y_pos + 9, GREY);
 	rectfill(buffer, x_pos + 33, y_pos + 7, x_pos + 35, y_pos + 9, GREY);
-}
+} // draw_face_up
 
 void Game_State::draw_face_down(int x_pos, int y_pos) {
 	// eyes
@@ -426,7 +450,7 @@ void Game_State::draw_face_down(int x_pos, int y_pos) {
 	// nostrils
 	rectfill(buffer, x_pos + 10, y_pos + 37, x_pos + 12, y_pos + 39, GREY);
 	rectfill(buffer, x_pos + 33, y_pos + 37, x_pos + 35, y_pos + 39, GREY);
-}
+} // draw_face_down
 
 
 /**
@@ -453,6 +477,8 @@ Displays the end game menu.
 */
 void Game_State::end_game_menu() {
 	clear_bitmap(buffer);
+	stop_sample(background_music);
+	play_sample(game_over_sound, VOLUME, PANNING, FREQUENCY, FALSE);
 	draw_game_board();
 	textout_centre_ex(buffer, game_font, "Uh oh, the Game has ended!", WIDTH / 2, HEIGHT / 2 - 25, WHITE, -1);
 	textout_centre_ex(buffer, game_font, "Press ESC to exit the game!", WIDTH / 2, HEIGHT / 2, WHITE, -1);

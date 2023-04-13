@@ -154,6 +154,11 @@
   <ItemGroup>
     <None Include="graphics\franklin_gothic_heavy_font.pcx" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="sounds\apple_crunch.wav" />
+    <Media Include="sounds\background_music.wav" />
+    <Media Include="sounds\end_game_sound.wav" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

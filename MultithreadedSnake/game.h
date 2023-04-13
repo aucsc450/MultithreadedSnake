@@ -62,12 +62,16 @@ typedef struct spawn_apple_params {
 class Game_State {
 private:
 	static pthread_t apple_thread;
+	static pthread_t input_thread;
 	BITMAP* buffer;
 	FONT* game_font;
+	SAMPLE* background_music;
+	SAMPLE* crunch_sound;
+	SAMPLE* game_over_sound;
 	static Board* game_board;
 	Snake* player;
 	static bool game_over;
-	direction dir;
+	static direction dir;
 	static volatile int speed_counter;
 	static volatile int timer;
 	int total_score;
@@ -77,6 +81,7 @@ public:
 	Game_State();
 	~Game_State();
 	bool load_fonts();
+	bool load_sounds();
 	bool initialize_game();
 	void start_game();
 	void new_game();
