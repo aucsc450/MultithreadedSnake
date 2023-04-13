@@ -11,6 +11,7 @@
 // Variables to be shared among all the threads
 volatile int Game_State::speed_counter = 0;
 volatile int Game_State::timer = 0;
+int Game_State::total_score = 0;
 bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
 pthread_t Game_State::apple_thread;
@@ -30,9 +31,7 @@ Game_State::Game_State() {
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	// dir = NONE;
-	total_score = 0;
-	seconds_elasped = 0;
-	minutes_elasped = 0;
+	// total_score = 0;
 	LOCK_VARIABLE(speed_counter);
 	LOCK_FUNCTION(increment_speed_counter);
 } // constructor
@@ -115,8 +114,6 @@ void Game_State::reset_game() {
 	speed_counter = 0;
 	timer = 0;
 	total_score = 0;
-	seconds_elasped = 0;
-	minutes_elasped = 0;
 	player->reset();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	//game_board->generate_apple();
@@ -211,7 +208,6 @@ Runs the following methods associated with the game logic, such as moving the pl
 getting input from the user, and ensuring that all sprites are not out of bounds.
 */
 void Game_State::run_game_logic() {
-	// handle_keyboard_input();
 	if (dir != NONE) {
 		Cell* curr_position = player->get_snake()->get_front()->get_data();
 		Cell* next_cell = get_next_cell(curr_position);
@@ -231,7 +227,6 @@ void Game_State::run_game_logic() {
 			next_cell->set_type(EMPTY);
 			total_score += 100;
 		}
-		//dir = NONE;
 	}
 } // run_game_logic
 
@@ -258,9 +253,6 @@ bool Game_State::play_game() {
 			game_over = true;
 			pressed_esc = true;
 		}
-		// Determining how long the player has played for currently
-		seconds_elasped = (timer / FPS) % FPS;
-		minutes_elasped = (timer / FPS) / FPS;
 		// Updating the screen
 		draw_game_board();
 		draw_snake();
@@ -310,11 +302,11 @@ void Game_State::draw_game_board() {
 	textout_right_ex(buffer, font, "Made for AUCSC 450 Winter 2023", WIDTH - 20, HEIGHT - 15, WHITE, -1);
 	textprintf_ex(buffer, game_font, 25, 25, WHITE, -1, "Score: %d", total_score);
 	textout_right_ex(buffer, game_font, "Stop - ESC", WIDTH - 25, 25, WHITE, -1);
-	if (seconds_elasped < 10) {
-		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : 0%d", minutes_elasped, seconds_elasped);
+	if ((timer / FPS) % FPS < 10) {
+		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : 0%d", (timer / FPS) / FPS, (timer / FPS) % FPS);
 	}
 	else {
-		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d", minutes_elasped, seconds_elasped);
+		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d", (timer / FPS) / FPS, (timer / FPS) % FPS);
 	}
 } // draw_game_board
 

@@ -74,9 +74,7 @@ private:
 	static direction dir;
 	static volatile int speed_counter;
 	static volatile int timer;
-	int total_score;
-	int seconds_elasped;
-	int minutes_elasped;
+	static int total_score;
 public:
 	Game_State();
 	~Game_State();
