@@ -29,6 +29,8 @@ public:
 	bool is_empty();
 	void enqueue(Cell* cell_p);
 	Node* dequeue();
+	bool is_front(Node* node_p);
+	bool is_rear(Node* node_p);
 };
 
 #endif

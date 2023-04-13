@@ -89,3 +89,27 @@ Node* Queue::dequeue() {
     size--;
     return temp;
 } // dequeue
+
+/**
+Checks whether the specified node is the front node.
+@param node_p - the node to compare to the front node
+@return - true if node_p is equal to the front node, false otherwise
+*/
+bool Queue::is_front(Node* node_p) {
+    if (node_p == front) {
+        return true;
+    }
+    return false;
+} // is_front
+
+/**
+Checks whether the specified node is the rear node.
+@param node_p - the node to compare to the rear node
+@return - true if node_p is equal to the rear node, false otherwise
+*/
+bool Queue::is_rear(Node* node_p) {
+    if (node_p == rear) {
+        return true;
+    }
+    return false;
+} // is_rear

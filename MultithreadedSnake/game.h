@@ -2,7 +2,7 @@
 * File: game.h
 *
 * Author: Anjola Aina
-* Last Modified: Monday, April 10th, 2023
+* Last Modified: Thursday, April 13th, 2023
 *
 * This file defines the game_state class, which contains the objects and functions controlling the execution of the game.
 */
@@ -35,7 +35,7 @@
 #define VOLUME 32
 #define PANNING 32
 #define FREQUENCY 1000
-#define SLOW_MOVEMENT_DOWN 10
+#define SLOW_MOVEMENT_DOWN 7
 #define MAX_SCORE_LEN 12 // max int digits = 10 + 1 to account for the '\0' (null) character and + 1 for the '-' character
 #define MAX_TIME_LEN 3
 
@@ -52,31 +52,29 @@
 #define Y_OFFSET 77
 #define SNAKE_BLOCK_SIZE 45
 
-// thread parameter struct
-typedef struct spawn_apple_params {
-	int row;
-	int col;
-} spawn_apple_params;
-
 // The game_state class
 class Game_State {
 private:
 	static pthread_t apple_thread;
+	static pthread_t input_thread;
+	static pthread_t end_game_thread;
 	BITMAP* buffer;
 	FONT* game_font;
+	SAMPLE* background_music;
+	SAMPLE* crunch_sound;
+	SAMPLE* game_over_sound;
 	static Board* game_board;
 	Snake* player;
 	static bool game_over;
-	direction dir;
+	static direction dir;
 	static volatile int speed_counter;
-	volatile int timer;
-	int total_score;
-	int seconds_elasped;
-	int minutes_elasped;
+	static volatile int timer;
+	static int total_score;
 public:
 	Game_State();
 	~Game_State();
 	bool load_fonts();
+	bool load_sounds();
 	bool initialize_game();
 	void start_game();
 	void new_game();
@@ -84,12 +82,16 @@ public:
 	void run_game();
 	bool main_menu();
 	Cell* get_next_cell(Cell* curr_position);
-	void handle_keyboard_input();
 	bool is_snake_out_of_bounds(int row, int col);
 	void run_game_logic();
 	bool play_game();
 	void draw_game_board();
 	void draw_snake();
+	void draw_snake_face(int x_pos, int y_pos);
+	void draw_face_left(int x_pos, int y_pos);
+	void draw_face_right(int x_pos, int y_pos);
+	void draw_face_up(int x_pos, int y_pos);
+	void draw_face_down(int x_pos, int y_pos);
 	void draw_apple();
 	void end_game_menu();
 	void update_screen();
@@ -97,6 +99,8 @@ public:
 	static pthread_t create_pthread(void* (*thread_function) (void*), void* param);
 	static bool is_apple_in_board();
 	static void* spawn_apple(void* args);
+	static void* handle_keyboard_input(void* args);
+	static void* end_game(void* args);
 };
 
 #endif

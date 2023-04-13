@@ -2,7 +2,7 @@
 * File: game.cpp
 *
 * Author: Anjola Aina
-* Last Modified: Monday, April 10th, 2023
+* Last Modified: Thursday, April 13th, 2023
 *
 * This file implements the game_state class.
 */
@@ -10,9 +10,14 @@
 
 // Variables to be shared among all the threads
 volatile int Game_State::speed_counter = 0;
+volatile int Game_State::timer = 0;
+int Game_State::total_score = 0;
 bool Game_State::game_over = false;
 Board* Game_State::game_board = new Board();
 pthread_t Game_State::apple_thread;
+pthread_t Game_State::input_thread;
+pthread_t Game_State::end_game_thread;
+direction Game_State::dir = NONE;
 
 /*
 Constructs a new instance of the game class, and initializes all variables.
@@ -20,15 +25,14 @@ Constructs a new instance of the game class, and initializes all variables.
 Game_State::Game_State() {
 	buffer = create_bitmap(WIDTH, HEIGHT);
 	game_font = NULL;
+	background_music = NULL;
+	crunch_sound = NULL;
+	game_over_sound = NULL;
 	game_board->generate_apple();
 	player = new Snake();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
-	dir = NONE;
-	speed_counter = 0;
-	timer = 0;
-	total_score = 0;
-	seconds_elasped = 0;
-	minutes_elasped = 0;
+	// dir = NONE;
+	// total_score = 0;
 	LOCK_VARIABLE(speed_counter);
 	LOCK_FUNCTION(increment_speed_counter);
 } // constructor
@@ -54,12 +58,27 @@ bool Game_State::load_fonts() {
 } // load_fonts
 
 /*
+Loads all BMP files into the sounds used in the game.
+@return - true if all files was loaded successfully into their respective sounds, false otherwise
+*/
+bool Game_State::load_sounds() {
+	background_music = load_sample("sounds\\background_music.wav");
+	crunch_sound = load_sample("sounds\\apple_crunch.wav");
+	game_over_sound = load_sample("sounds\\end_game_sound.wav");
+	if (background_music != NULL && crunch_sound != NULL && game_over_sound != NULL) {
+		return true;
+	}
+	return false; // sounds are null
+} // load_sounds
+
+/*
 Initializes the game by loading all the game objects.
 @return - true if every game object was loaded successfully, false otherwise
 */
 bool Game_State::initialize_game() {
 	bool loaded_fonts = load_fonts();
-	if (!loaded_fonts) {
+	bool loaded_sounds = load_sounds();
+	if (!loaded_fonts || !loaded_sounds) {
 		return false;
 	}
 	return true;
@@ -76,6 +95,7 @@ void Game_State::start_game() {
 		allegro_message("Error loading game objects.");
 		return;
 	}
+	play_sample(background_music, VOLUME, PANNING, FREQUENCY, TRUE);
 	new_game();
 } // start_game
 
@@ -95,8 +115,6 @@ void Game_State::reset_game() {
 	speed_counter = 0;
 	timer = 0;
 	total_score = 0;
-	seconds_elasped = 0;
-	minutes_elasped = 0;
 	player->reset();
 	player->grow(new Cell(BOARD_SIZE / 2, BOARD_SIZE / 2, SNAKE));
 	//game_board->generate_apple();
@@ -174,28 +192,6 @@ Cell* Game_State::get_next_cell(Cell* curr_position) {
 } // get_next_cell
 
 /**
-Handles keyboard input by changing the direction of the snake based on what key the user presses.
-*/
-void Game_State::handle_keyboard_input() {
-	clear_keybuf();
-	if (key[KEY_LEFT]) {
-		dir = LEFT;
-	}
-	else if (key[KEY_RIGHT]) {
-		dir = RIGHT;
-	}
-	else if (key[KEY_UP]) {
-		dir = UP;
-	}
-	else if (key[KEY_DOWN]) {
-		dir = DOWN;
-	}
-	else {
-		dir = NONE;
-	}
-} // handle_keyboard_input
-
-/**
 Determines whether the snake is out of bounds, by checking if the current row and col are either 0 or larger than the board size.
 @param row - the x-coordinate of the snake's head
 @param col - the y-coordinate of the snake's head
@@ -213,7 +209,6 @@ Runs the following methods associated with the game logic, such as moving the pl
 getting input from the user, and ensuring that all sprites are not out of bounds.
 */
 void Game_State::run_game_logic() {
-	handle_keyboard_input();
 	if (dir != NONE) {
 		Cell* curr_position = player->get_snake()->get_front()->get_data();
 		Cell* next_cell = get_next_cell(curr_position);
@@ -228,11 +223,11 @@ void Game_State::run_game_logic() {
 		}
 		player->move(next_cell);
 		if (next_cell->get_type() == APPLE) {
+			play_sample(crunch_sound, VOLUME * 2, PANNING, FREQUENCY, FALSE);
 			player->grow(curr_position);
 			next_cell->set_type(EMPTY);
 			total_score += 100;
 		}
-		dir = NONE;
 	}
 } // run_game_logic
 
@@ -241,9 +236,12 @@ Runs the game.
 @return - true if the user pressed the esc button, false otherwise
 */
 bool Game_State::play_game() {
-	bool pressed_esc = false;
+	void* pressed_esc;
 	// Setting up threads
-	apple_thread = create_pthread(spawn_apple, NULL);
+	apple_thread = create_pthread(spawn_apple, NULL); // spawning apple
+	input_thread = create_pthread(handle_keyboard_input, NULL); // handling input from keyboard
+	end_game_thread = create_pthread(end_game, NULL); // did the user press the ESC key?
+	// Game loop
 	while (!game_over) {
 		while (speed_counter > 0) {
 			speed_counter--;
@@ -251,24 +249,16 @@ bool Game_State::play_game() {
 			if (timer % SLOW_MOVEMENT_DOWN == 0) { // this slows down the game logic so that it executes less frequently
 				run_game_logic();
 			}
-			
 		} // inner while
-		// Game is over if the user has pressed the ESC key
-		if (key[KEY_ESC]) {
-			game_over = true;
-			pressed_esc = true;
-		}
-		// Determining how long the player has played for currently
-		seconds_elasped = (timer / FPS) % FPS;
-		minutes_elasped = (timer / FPS) / FPS;
 		// Updating the screen
 		draw_game_board();
-		draw_snake();
 		draw_apple();
+		draw_snake();
 		update_screen();
 	} // game loop
+	pthread_join(end_game_thread, &pressed_esc);
 	remove_int(increment_speed_counter); // removing the interrupt handler as we don't need it anymore
-	return pressed_esc;
+	return (bool)pressed_esc;
 } // play_game
 
 /*
@@ -310,11 +300,11 @@ void Game_State::draw_game_board() {
 	textout_right_ex(buffer, font, "Made for AUCSC 450 Winter 2023", WIDTH - 20, HEIGHT - 15, WHITE, -1);
 	textprintf_ex(buffer, game_font, 25, 25, WHITE, -1, "Score: %d", total_score);
 	textout_right_ex(buffer, game_font, "Stop - ESC", WIDTH - 25, 25, WHITE, -1);
-	if (seconds_elasped < 10) {
-		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : 0%d", minutes_elasped, seconds_elasped);
+	if ((timer / FPS) % FPS < 10) {
+		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : 0%d", (timer / FPS) / FPS, (timer / FPS) % FPS);
 	}
 	else {
-		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d", minutes_elasped, seconds_elasped);
+		textprintf_centre_ex(buffer, game_font, WIDTH / 2, 25, WHITE, -1, "%d : %d", (timer / FPS) / FPS, (timer / FPS) % FPS);
 	}
 } // draw_game_board
 
@@ -329,9 +319,116 @@ void Game_State::draw_snake() {
 		int x_pos = (col * TILE_SIZE) + X_OFFSET;
 		int y_pos = (row * TILE_SIZE) + Y_OFFSET;
 		rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, BLACK);
+		if (player->get_snake()->is_front(temp)) {
+			draw_snake_face(x_pos, y_pos);
+		}
 		temp = temp->get_next();
 	} // while
 } // draw_snake
+
+/**
+Draws the snake's face, depending on what direction the snake is currently going.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
+void Game_State::draw_snake_face(int x_pos, int y_pos) {
+	switch (dir) {
+		case LEFT:
+			draw_face_left(x_pos, y_pos);
+			break;
+		case RIGHT:
+			draw_face_right(x_pos, y_pos);
+			break;
+		case UP:
+			draw_face_up(x_pos, y_pos);
+			break;
+		case DOWN:
+			draw_face_down(x_pos, y_pos);
+			break;
+		case NONE:
+			draw_face_up(x_pos, y_pos);
+	}
+} // draw_snake_front
+
+/**
+Draws the face of the snake when the snake's direction is LEFT.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
+void Game_State::draw_face_left(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 20, y_pos + 5, x_pos + 30, y_pos + 15, WHITE);
+	rectfill(buffer, x_pos + 20, y_pos + 30, x_pos + 30, y_pos + 40, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 25, y_pos + 7, x_pos + 30, y_pos + 13, BLACK);
+	rectfill(buffer, x_pos + 25, y_pos + 32, x_pos + 30, y_pos + 38, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 27, y_pos + 8, x_pos + 28, y_pos + 9, WHITE);
+	rectfill(buffer, x_pos + 27, y_pos + 33, x_pos + 28, y_pos + 34, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 8, y_pos + 10, x_pos + 10, y_pos + 12, GREY);
+	rectfill(buffer, x_pos + 8, y_pos + 32, x_pos + 10, y_pos + 34, GREY);
+} // draw_face_left
+
+/**
+Draws the face of the snake when the snake's direction is RIGHT.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
+void Game_State::draw_face_right(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 15, y_pos + 5, x_pos + 25, y_pos + 15, WHITE);
+	rectfill(buffer, x_pos + 15, y_pos + 30, x_pos + 25, y_pos + 40, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 15, y_pos + 7, x_pos + 20, y_pos + 13, BLACK);
+	rectfill(buffer, x_pos + 15, y_pos + 32, x_pos + 20, y_pos + 38, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 17, y_pos + 8, x_pos + 18, y_pos + 9, WHITE);
+	rectfill(buffer, x_pos + 17, y_pos + 33, x_pos + 18, y_pos + 34, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 35, y_pos + 10, x_pos + 37, y_pos + 12, GREY);
+	rectfill(buffer, x_pos + 35, y_pos + 32, x_pos + 37, y_pos + 34, GREY);
+} // draw_face_right
+
+/**
+Draws the face of the snake when the snake's direction is UP.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
+void Game_State::draw_face_up(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 5, y_pos + 15, x_pos + 15, y_pos + 25, WHITE);
+	rectfill(buffer, x_pos + 30, y_pos + 15, x_pos + 40, y_pos + 25, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 7, y_pos + 19, x_pos + 13, y_pos + 25, BLACK);
+	rectfill(buffer, x_pos + 32, y_pos + 19, x_pos + 38, y_pos + 25, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 8, y_pos + 20, x_pos + 9, y_pos + 21, WHITE);
+	rectfill(buffer, x_pos + 36, y_pos + 20, x_pos + 37, y_pos + 21, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 10, y_pos + 7, x_pos + 12, y_pos + 9, GREY);
+	rectfill(buffer, x_pos + 33, y_pos + 7, x_pos + 35, y_pos + 9, GREY);
+} // draw_face_up
+
+/**
+Draws the face of the snake when the snake's direction is DOWN.
+@param x_pos - the x position of the snake's front
+@param y_pos - the y position of the snake's front
+*/
+void Game_State::draw_face_down(int x_pos, int y_pos) {
+	// eyes
+	rectfill(buffer, x_pos + 5, y_pos + 15, x_pos + 15, y_pos + 25, WHITE);
+	rectfill(buffer, x_pos + 30, y_pos + 15, x_pos + 40, y_pos + 25, WHITE);
+	// pupils
+	rectfill(buffer, x_pos + 7, y_pos + 15, x_pos + 13, y_pos + 21, BLACK);
+	rectfill(buffer, x_pos + 32, y_pos + 15, x_pos + 38, y_pos + 21, BLACK);
+	// white eye part
+	rectfill(buffer, x_pos + 8, y_pos + 16, x_pos + 9, y_pos + 17, WHITE);
+	rectfill(buffer, x_pos + 36, y_pos + 16, x_pos + 37, y_pos + 17, WHITE);
+	// nostrils
+	rectfill(buffer, x_pos + 10, y_pos + 37, x_pos + 12, y_pos + 39, GREY);
+	rectfill(buffer, x_pos + 33, y_pos + 37, x_pos + 35, y_pos + 39, GREY);
+} // draw_face_down
 
 /**
 Draws the apple to the double buffer.
@@ -342,7 +439,9 @@ void Game_State::draw_apple() {
 			if (game_board->get_specific_cell(i, j)->get_type() == APPLE) {
 				int x_pos = (j * TILE_SIZE) + X_OFFSET;
 				int y_pos = (i * TILE_SIZE) + Y_OFFSET;
-				rectfill(buffer, x_pos, y_pos, x_pos + SNAKE_BLOCK_SIZE, y_pos + SNAKE_BLOCK_SIZE, APPLE_RED);
+				circlefill(buffer, x_pos + 16, y_pos + 25, 17, APPLE_RED);
+				circlefill(buffer, x_pos + 29, y_pos + 25, 17, APPLE_RED);
+				rectfill(buffer, x_pos + 21, y_pos, x_pos + 24, y_pos + 12, FOREST_BROWN);
 			} // if
 		} // inner for
 	} // outer for
@@ -355,6 +454,8 @@ Displays the end game menu.
 */
 void Game_State::end_game_menu() {
 	clear_bitmap(buffer);
+	stop_sample(background_music);
+	play_sample(game_over_sound, VOLUME, PANNING, FREQUENCY, FALSE);
 	draw_game_board();
 	textout_centre_ex(buffer, game_font, "Uh oh, the Game has ended!", WIDTH / 2, HEIGHT / 2 - 25, WHITE, -1);
 	textout_centre_ex(buffer, game_font, "Press ESC to exit the game!", WIDTH / 2, HEIGHT / 2, WHITE, -1);
@@ -413,8 +514,11 @@ bool Game_State::is_apple_in_board() {
 	return false; // an apple is currently NOT in the board
 } // is_apple_in_board
 
+/**
+The thread method that spawns an apple if an apple is not already in the game board.
+@param args - thread parameters (none)
+*/
 void* Game_State::spawn_apple(void* args) {
-	// spawn_apple_params* thread_params = (spawn_apple_params*) args;
 	while (!game_over) {
 		if (!is_apple_in_board()) {
 			game_board->generate_apple();
@@ -423,3 +527,44 @@ void* Game_State::spawn_apple(void* args) {
 	pthread_join(apple_thread, NULL);
 	return NULL;
 } // spawn_apple
+
+/**
+Handles keyboard input by changing the direction of the snake based on what key the user presses.
+@param args - thread parameters (none)
+*/
+void* Game_State::handle_keyboard_input(void* args) {
+	while (!game_over) {
+		while (speed_counter > 0) {
+			clear_keybuf();
+			if (key[KEY_LEFT]) {
+				dir = LEFT;
+			}
+			else if (key[KEY_RIGHT]) {
+				dir = RIGHT;
+			}
+			else if (key[KEY_UP]) {
+				dir = UP;
+			}
+			else if (key[KEY_DOWN]) {
+				dir = DOWN;
+			}
+		} // inner while
+	} // game loop
+	pthread_join(input_thread, NULL);
+	return NULL;
+} // handle_keyboard_input
+
+/**
+Checks whether or not the player has pressed the ESC key to stop the game.
+@param args - thread parameters (none)
+@return - true if the player pressed the ESC button, false otherwise
+*/
+void* Game_State::end_game(void* args) {
+	while (!game_over) {
+		if (key[KEY_ESC]) {
+			game_over = true;
+			return (void*) true;
+		}
+	} // while
+	return (void*) false; 
+} // end_game
