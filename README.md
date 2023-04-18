@@ -5,6 +5,9 @@ In the snake game, a player controls the snake's head, and must move it using th
 head collides with any part of the snake's body, or the borders of the game board, the game is over. The snake grows by eating an apple
 that randomly spawns in some position of the board.
 
+## Gameplay (x4 speedup)
+https://user-images.githubusercontent.com/92893114/232644836-76db4140-bb54-4749-aa9a-d27cf813c6af.mp4
+
 ## Language & Libraries
 - Made with C/C++
 - Includes the Allegro 4.4.2 library (a game library for C/C++ programming and includes DirectX and OpenGL to support it)
